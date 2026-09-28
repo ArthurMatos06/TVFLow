@@ -19,7 +19,7 @@ export function SearchResults({ items, genres, totalResults }: SearchResultsProp
           {totalResults} {totalResults === 1 ? 'resultado' : 'resultados'}
         </p>
       )}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="stagger-fade-in grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {items.map((item) => (
           <SearchResultCard key={`${item.mediaType}-${item.id}`} item={item} genres={genres} />
         ))}
@@ -40,7 +40,7 @@ function SearchResultCard({ item, genres }: SearchResultCardProps) {
   const href = item.mediaType === 'movie' ? `/movie/${item.id}` : `/tv/${item.id}`
 
   return (
-    <Link to={href} className="group flex flex-col">
+    <Link to={href} className="group animate-fade-in flex flex-col">
       <div className="relative">
         <MediaImage
           src={posterUrl}

@@ -26,6 +26,7 @@ export function SeasonsAccordion({ seasons }: SeasonsAccordionProps) {
                 type="button"
                 onClick={() => setOpenIndex(isOpen ? null : index)}
                 aria-expanded={isOpen}
+                aria-controls={`season-panel-${season.id}`}
                 className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-surface-hover"
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -43,7 +44,10 @@ export function SeasonsAccordion({ seasons }: SeasonsAccordionProps) {
                 />
               </button>
               {isOpen && (
-                <div className="flex flex-col gap-4 border-t border-border px-4 py-4 sm:flex-row">
+                <div
+                  id={`season-panel-${season.id}`}
+                  className="flex flex-col gap-4 border-t border-border px-4 py-4 sm:flex-row"
+                >
                   <MediaImage
                     src={getImageUrl(season.poster_path, 'w185')}
                     alt={season.name}

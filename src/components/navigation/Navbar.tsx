@@ -69,7 +69,7 @@ export function Navbar() {
         <button
           type="button"
           className="flex h-9 w-9 items-center justify-center rounded-md text-text md:hidden"
-          aria-label="Abrir menu"
+          aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen((prev) => !prev)}
         >
@@ -83,7 +83,7 @@ export function Navbar() {
       </div>
 
       {isMenuOpen && (
-        <nav className="flex flex-col gap-1 border-t border-border bg-background px-4 py-4 md:hidden">
+        <nav className="animate-slide-in-down flex flex-col gap-1 border-t border-border bg-background px-4 py-4 md:hidden">
           {navLinks.map((link) => (
             <NavLink
               key={link.to}

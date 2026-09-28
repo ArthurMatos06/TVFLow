@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import type { ReactNode } from 'react'
 import { SearchBar, SearchEmpty, SearchFilters, SearchResults } from '@/components/search'
 import { ErrorState, Pagination, Skeleton } from '@/components/ui'
@@ -10,6 +11,7 @@ import {
   useSearchMulti,
   useSearchTVShows,
 } from '@/hooks'
+import type { SearchType } from '@/types/search'
 import { DEFAULT_SORT, isValidQuery, toSearchResultItem } from '@/utils/search'
 
 export function Search() {
@@ -66,6 +68,15 @@ export function Search() {
 
   const hasFilters = Boolean(genreId || year || sortBy !== DEFAULT_SORT || type !== 'multi')
 
+  const handleTypeChange = useCallback((nextType: SearchType) => setType(nextType), [setType])
+  const handleGenreChange = useCallback(
+    (nextGenreId: number | null) => setGenreId(nextGenreId),
+    [setGenreId],
+  )
+  const handleYearChange = useCallback((nextYear: string) => setYear(nextYear), [setYear])
+  const handleSortChange = useCallback((nextSortBy: string) => setSortBy(nextSortBy), [setSortBy])
+  const handlePageChange = useCallback((nextPage: number) => setPage(nextPage), [setPage])
+
   const renderContent = (): ReactNode => {
     if (!activeQuery) {
       return (
@@ -108,7 +119,7 @@ export function Search() {
     return (
       <>
         <SearchResults items={items} genres={genres} totalResults={data.total_results} />
-        <Pagination currentPage={data.page} totalPages={data.total_pages} onPageChange={setPage} />
+        <Pagination currentPage={data.page} totalPages={data.total_pages} onPageChange={handlePageChange} />
       </>
     )
   }
@@ -130,10 +141,10 @@ export function Search() {
         year={year}
         sortBy={sortBy}
         genres={genres ?? []}
-        onTypeChange={setType}
-        onGenreChange={setGenreId}
-        onYearChange={setYear}
-        onSortChange={setSortBy}
+        onTypeChange={handleTypeChange}
+        onGenreChange={handleGenreChange}
+        onYearChange={handleYearChange}
+        onSortChange={handleSortChange}
       />
 
       {renderContent()}

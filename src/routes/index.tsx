@@ -1,40 +1,52 @@
+import { lazy, Suspense } from 'react'
+import type { ReactNode } from 'react'
 import { Route, Routes } from 'react-router-dom'
+import { PageLoader } from '@/components/ui/PageLoader'
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { MainLayout } from '@/layouts/MainLayout'
-import { EditProfile } from '@/pages/EditProfile'
-import { Favorites } from '@/pages/Favorites'
-import { Home } from '@/pages/Home'
-import { Login } from '@/pages/Login'
-import { MovieDetails } from '@/pages/MovieDetails'
-import { Movies } from '@/pages/Movies'
-import { Profile } from '@/pages/Profile'
-import { Register } from '@/pages/Register'
-import { Search } from '@/pages/Search'
-import { TvDetails } from '@/pages/TvDetails'
-import { TvShows } from '@/pages/TvShows'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
+
+const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })))
+const Movies = lazy(() => import('@/pages/Movies').then((m) => ({ default: m.Movies })))
+const TvShows = lazy(() => import('@/pages/TvShows').then((m) => ({ default: m.TvShows })))
+const Search = lazy(() => import('@/pages/Search').then((m) => ({ default: m.Search })))
+const MovieDetails = lazy(() =>
+  import('@/pages/MovieDetails').then((m) => ({ default: m.MovieDetails })),
+)
+const TvDetails = lazy(() => import('@/pages/TvDetails').then((m) => ({ default: m.TvDetails })))
+const Favorites = lazy(() => import('@/pages/Favorites').then((m) => ({ default: m.Favorites })))
+const Profile = lazy(() => import('@/pages/Profile').then((m) => ({ default: m.Profile })))
+const EditProfile = lazy(() =>
+  import('@/pages/EditProfile').then((m) => ({ default: m.EditProfile })),
+)
+const Login = lazy(() => import('@/pages/Login').then((m) => ({ default: m.Login })))
+const Register = lazy(() => import('@/pages/Register').then((m) => ({ default: m.Register })))
+
+function withPageLoader(element: ReactNode) {
+  return <Suspense fallback={<PageLoader />}>{element}</Suspense>
+}
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/movies" element={<Movies />} />
-        <Route path="/tv" element={<TvShows />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/movie/:id" element={<MovieDetails />} />
-        <Route path="/tv/:id" element={<TvDetails />} />
+        <Route path="/" element={withPageLoader(<Home />)} />
+        <Route path="/movies" element={withPageLoader(<Movies />)} />
+        <Route path="/tv" element={withPageLoader(<TvShows />)} />
+        <Route path="/search" element={withPageLoader(<Search />)} />
+        <Route path="/movie/:id" element={withPageLoader(<MovieDetails />)} />
+        <Route path="/tv/:id" element={withPageLoader(<TvDetails />)} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/favorites" element={<Favorites />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/profile/edit" element={<EditProfile />} />
+          <Route path="/favorites" element={withPageLoader(<Favorites />)} />
+          <Route path="/profile" element={withPageLoader(<Profile />)} />
+          <Route path="/profile/edit" element={withPageLoader(<EditProfile />)} />
         </Route>
       </Route>
 
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={withPageLoader(<Login />)} />
+        <Route path="/register" element={withPageLoader(<Register />)} />
       </Route>
     </Routes>
   )

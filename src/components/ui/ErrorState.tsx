@@ -12,7 +12,7 @@ export function ErrorState({
   onRetry,
 }: ErrorStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-border bg-surface px-6 py-16 text-center">
+    <div className="animate-slide-in-up flex flex-col items-center justify-center gap-3 rounded-lg border border-border bg-surface px-6 py-16 text-center">
       <h3 className="text-lg font-medium text-text">{title}</h3>
       <p className="max-w-sm text-sm text-text-muted">{description}</p>
       {onRetry && (

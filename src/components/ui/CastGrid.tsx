@@ -15,7 +15,7 @@ export function CastGrid({ cast }: CastGridProps) {
   if (cast.length === 0) return null
 
   return (
-    <Carousel>
+    <Carousel label="Elenco">
       {cast.map((person) => (
         <div key={person.id} className="w-32 shrink-0 sm:w-36">
           <MediaImage

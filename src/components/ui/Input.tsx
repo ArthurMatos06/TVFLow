@@ -25,8 +25,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={clsx(
-              'w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent',
-              error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
+              'w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-muted transition-all duration-200 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40',
+              error && 'border-red-500 focus:border-red-500 focus:ring-red-500/40',
               trailing && 'pr-10',
               className,
             )}
@@ -41,7 +41,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <span id={`${inputId}-error`} className="text-xs text-red-500">
+          <span id={`${inputId}-error`} className="animate-slide-in-up text-xs text-red-500">
             {error}
           </span>
         )}

@@ -64,7 +64,21 @@
       "Bash(find /home/arthurmatos/Projects/TvFlow-front/src -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\))",
       "Bash(find /home/arthurmatos/Projects/TvFlow-front/src/hooks -type f -name \"*.ts*\")",
       "Bash(find /home/arthurmatos/Projects/TvFlow-front/src/services -type f -name \"*.ts*\")",
-      "Bash(find /home/arthurmatos/Projects/TvFlow-front/src/mocks -type f -name \"*.ts*\")"
+      "Bash(find /home/arthurmatos/Projects/TvFlow-front/src/mocks -type f -name \"*.ts*\")",
+      "Bash(find 'C:/Users/juang/WebstormProjects/Tv-flow-novo/src/components/ui' -name \"*.tsx\")",
+      "Bash(find 'C:/Users/juang/WebstormProjects/Tv-flow-novo/src/routes' -type f)",
+      "Bash(find . -type f -name \"*.tsx\" -o -name \"*.ts\" -o -name \"*.json\")",
+      "Bash(npx tsc *)",
+      "Bash(xargs grep -E \"as\\s+any|:\\s*any\")",
+      "Bash(find . -name \"index.css\" -o -name \"*.css\")",
+      "Bash(find src/hooks -name \"*.ts\" -o -name \"*.tsx\")",
+      "Bash(grep *)",
+      "Bash(xargs grep \"export function\\|export const\")",
+      "Bash(find src -name '*tmdb*' -type f)",
+      "Bash(find src -name 'services' -type d)",
+      "Bash(find src/types -name '*.ts')",
+      "Bash(find src -name 'routes*' -o -name '*Routes*')",
+      "Bash(find src -name '*.css' -o -name 'globals*')"
     ]
   }
 }

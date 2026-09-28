@@ -20,6 +20,7 @@ interface AuthState {
   login: (credentials: LoginCredentials) => Promise<void>
   register: (data: RegisterData) => Promise<void>
   logout: () => void
+  updateUser: (user: User) => void
   hydrate: () => void
   clearError: () => void
 }
@@ -65,6 +66,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     clearAuthStorage()
     set({ user: null, token: null, isAuthenticated: false, error: null })
+  },
+
+  updateUser: (user) => {
+    setStoredUser(user)
+    set({ user })
   },
 
   hydrate: () => {

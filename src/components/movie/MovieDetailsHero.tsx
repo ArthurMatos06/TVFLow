@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button, GenreBadge, HeartIcon, MediaImage, StarIcon, StarRating } from '@/components/ui'
+import { useFavorites, useRatings } from '@/hooks'
 import { getImageUrl } from '@/services/tmdb'
 import type { Director, MovieDetailsResponse } from '@/types'
 import { formatRating, formatRuntime, formatYear } from '@/utils/media'
@@ -10,14 +11,28 @@ interface MovieDetailsHeroProps {
 }
 
 export function MovieDetailsHero({ movie, director }: MovieDetailsHeroProps) {
-  const [isFavorite, setIsFavorite] = useState(false)
-  const [userRating, setUserRating] = useState(0)
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites()
+  const { setRating, getRating } = useRatings()
+  const isMovieFavorite = isFavorite(movie.id)
+  const userRating = getRating(movie.id) ?? 0
   const [backdropError, setBackdropError] = useState(false)
 
   const backdropUrl = getImageUrl(movie.backdrop_path, 'w1280')
   const posterUrl = getImageUrl(movie.poster_path, 'w342')
   const year = formatYear(movie.release_date)
   const runtime = movie.runtime ? formatRuntime(movie.runtime) : null
+
+  const handleFavorite = () => {
+    if (isMovieFavorite) {
+      removeFavorite(movie.id)
+    } else {
+      addFavorite(movie.id, 'movie')
+    }
+  }
+
+  const handleRating = (rating: number) => {
+    setRating(movie.id, 'movie', rating)
+  }
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-border">
@@ -75,15 +90,15 @@ export function MovieDetailsHero({ movie, director }: MovieDetailsHeroProps) {
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <Button
               size="lg"
-              variant={isFavorite ? 'primary' : 'outline'}
-              onClick={() => setIsFavorite((prev) => !prev)}
+              variant={isMovieFavorite ? 'primary' : 'outline'}
+              onClick={handleFavorite}
             >
-              <HeartIcon className="h-4 w-4" filled={isFavorite} />
-              {isFavorite ? 'Favoritado' : 'Favoritar'}
+              <HeartIcon className="h-4 w-4" filled={isMovieFavorite} />
+              {isMovieFavorite ? 'Favoritado' : 'Favoritar'}
             </Button>
           </div>
           <div className="mt-2 rounded-xl border border-border bg-surface/60 p-4">
-            <StarRating value={userRating} onChange={setUserRating} label="Sua avaliação" />
+            <StarRating value={userRating} onChange={handleRating} label="Sua avaliação" />
           </div>
         </div>
       </div>

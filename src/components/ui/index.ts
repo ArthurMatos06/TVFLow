@@ -1,6 +1,7 @@
 export * from './Button'
 export * from './Input'
 export * from './Loading'
+export * from './PageLoader'
 export * from './Skeleton'
 export * from './EmptyState'
 export * from './ErrorState'

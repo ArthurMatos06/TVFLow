@@ -7,7 +7,7 @@ interface SkeletonProps {
 export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
-      className={clsx('animate-pulse rounded-md bg-surface-hover', className)}
+      className={clsx('shimmer-skeleton rounded-md', className)}
       aria-hidden="true"
     />
   )

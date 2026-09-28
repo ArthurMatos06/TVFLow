@@ -1,4 +1,5 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useCallback } from 'react'
+import type { ReactNode } from 'react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { Carousel, ContentSection, Hero } from '@/components/home'
 import { MovieCard } from '@/components/movie'
@@ -13,6 +14,7 @@ import {
   useTopRatedMovies,
   useTrendingMovies,
 } from '@/hooks'
+import type { TMDBMovie, TMDBTVShow } from '@/types'
 
 const ACTION_GENRE_ID = 28
 const COMEDY_GENRE_ID = 35
@@ -77,6 +79,15 @@ export function Home() {
   const horrorMovies = useMoviesByGenre(HORROR_GENRE_ID)
   const scifiMovies = useMoviesByGenre(SCIFI_GENRE_ID)
 
+  const renderMovie = useCallback(
+    (movie: TMDBMovie) => <MovieCard movie={movie} genres={genres} />,
+    [genres],
+  )
+  const renderTVShow = useCallback(
+    (show: TMDBTVShow) => <TvCard show={show} genres={genres} />,
+    [genres],
+  )
+
   const heroMovie = popularMovies.data?.[0]
 
   return (
@@ -87,56 +98,56 @@ export function Home() {
         title="Filmes populares"
         viewAllLink="/movies"
         query={popularMovies}
-        renderItem={(movie) => <MovieCard movie={movie} genres={genres} />}
+        renderItem={renderMovie}
       />
 
       <MediaRow
         title="Séries populares"
         viewAllLink="/tv"
         query={popularTVShows}
-        renderItem={(show) => <TvCard show={show} genres={genres} />}
+        renderItem={renderTVShow}
       />
 
       <MediaRow
         title="Mais bem avaliados"
         query={topRatedMovies}
-        renderItem={(movie) => <MovieCard movie={movie} genres={genres} />}
+        renderItem={renderMovie}
       />
 
       <MediaRow
         title="Lançamentos"
         query={latestMovies}
-        renderItem={(movie) => <MovieCard movie={movie} genres={genres} />}
+        renderItem={renderMovie}
       />
 
       <MediaRow
         title="Tendências"
         query={trendingMovies}
-        renderItem={(movie) => <MovieCard movie={movie} genres={genres} />}
+        renderItem={renderMovie}
       />
 
       <MediaRow
         title="Filmes de ação"
         query={actionMovies}
-        renderItem={(movie) => <MovieCard movie={movie} genres={genres} />}
+        renderItem={renderMovie}
       />
 
       <MediaRow
         title="Comédia"
         query={comedyMovies}
-        renderItem={(movie) => <MovieCard movie={movie} genres={genres} />}
+        renderItem={renderMovie}
       />
 
       <MediaRow
         title="Terror"
         query={horrorMovies}
-        renderItem={(movie) => <MovieCard movie={movie} genres={genres} />}
+        renderItem={renderMovie}
       />
 
       <MediaRow
         title="Ficção científica"
         query={scifiMovies}
-        renderItem={(movie) => <MovieCard movie={movie} genres={genres} />}
+        renderItem={renderMovie}
       />
     </div>
   )

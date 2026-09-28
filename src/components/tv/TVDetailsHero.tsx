@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button, GenreBadge, HeartIcon, MediaImage, StarIcon, StarRating } from '@/components/ui'
+import { useFavorites, useRatings } from '@/hooks'
 import { getImageUrl } from '@/services/tmdb'
 import type { TVShowDetailsResponse } from '@/types'
 import { formatRating, formatYear } from '@/utils/media'
@@ -9,13 +10,27 @@ interface TVDetailsHeroProps {
 }
 
 export function TVDetailsHero({ show }: TVDetailsHeroProps) {
-  const [isFavorite, setIsFavorite] = useState(false)
-  const [userRating, setUserRating] = useState(0)
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites()
+  const { setRating, getRating } = useRatings()
+  const isShowFavorite = isFavorite(show.id)
+  const userRating = getRating(show.id) ?? 0
   const [backdropError, setBackdropError] = useState(false)
 
   const backdropUrl = getImageUrl(show.backdrop_path, 'w1280')
   const posterUrl = getImageUrl(show.poster_path, 'w342')
   const year = formatYear(show.first_air_date)
+
+  const handleFavorite = () => {
+    if (isShowFavorite) {
+      removeFavorite(show.id)
+    } else {
+      addFavorite(show.id, 'tv')
+    }
+  }
+
+  const handleRating = (rating: number) => {
+    setRating(show.id, 'tv', rating)
+  }
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-border">
@@ -71,15 +86,15 @@ export function TVDetailsHero({ show }: TVDetailsHeroProps) {
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <Button
               size="lg"
-              variant={isFavorite ? 'primary' : 'outline'}
-              onClick={() => setIsFavorite((prev) => !prev)}
+              variant={isShowFavorite ? 'primary' : 'outline'}
+              onClick={handleFavorite}
             >
-              <HeartIcon className="h-4 w-4" filled={isFavorite} />
-              {isFavorite ? 'Favoritado' : 'Favoritar'}
+              <HeartIcon className="h-4 w-4" filled={isShowFavorite} />
+              {isShowFavorite ? 'Favoritado' : 'Favoritar'}
             </Button>
           </div>
           <div className="mt-2 rounded-xl border border-border bg-surface/60 p-4">
-            <StarRating value={userRating} onChange={setUserRating} label="Sua avaliação" />
+            <StarRating value={userRating} onChange={handleRating} label="Sua avaliação" />
           </div>
         </div>
       </div>

@@ -1,8 +1,13 @@
+import { lazy, Suspense } from 'react'
 import { useParams } from 'react-router-dom'
 import { MovieDetailsHero, SimilarMoviesSection } from '@/components/movie'
-import { CastGrid, ErrorState, Skeleton, TrailerEmbed } from '@/components/ui'
+import { CastGrid, ErrorState, Skeleton } from '@/components/ui'
 import { useGenres, useMovieDetails, useSimilarMovies } from '@/hooks'
 import type { Director, TMDBPerson } from '@/types'
+
+const TrailerEmbed = lazy(() =>
+  import('@/components/ui/TrailerEmbed').then((module) => ({ default: module.TrailerEmbed })),
+)
 
 function getDirector(crew: TMDBPerson[]): Director | null {
   const member = crew.find((person) => person.job === 'Director')
@@ -49,7 +54,11 @@ export function MovieDetails() {
     <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <MovieDetailsHero movie={movie} director={director} />
 
-      {trailer && <TrailerEmbed videoKey={trailer.key} title={`Trailer de ${movie.title}`} />}
+      {trailer && (
+        <Suspense fallback={<Skeleton className="aspect-video w-full rounded-2xl" />}>
+          <TrailerEmbed videoKey={trailer.key} title={`Trailer de ${movie.title}`} />
+        </Suspense>
+      )}
 
       {movie.credits.cast.length > 0 && (
         <section className="flex flex-col gap-4">

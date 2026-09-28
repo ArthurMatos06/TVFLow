@@ -30,16 +30,17 @@ export function Hero({ movie, genres, isLoading = false }: HeroProps) {
   const genreNames = getGenreNames(movie.genre_ids, genres)
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-border">
+    <section className="group relative overflow-hidden rounded-2xl border border-border">
       {backdropUrl && !backdropError && (
         <img
           src={backdropUrl}
           alt=""
           onError={() => setBackdropError(true)}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       <div className="relative z-10 flex min-h-[420px] flex-col justify-end gap-4 p-6 sm:p-10 lg:min-h-[520px]">
         <div className="flex flex-wrap items-center gap-3 text-sm">
           {year && <span className="font-medium text-text-muted">{year}</span>}
