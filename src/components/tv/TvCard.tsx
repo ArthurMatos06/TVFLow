@@ -24,7 +24,7 @@ function TvCardComponent({ show, genres }: TvCardProps) {
         <MediaImage
           src={posterUrl}
           alt={show.name}
-          className="aspect-[2/3] rounded-lg border border-border transition-shadow duration-300 group-hover:shadow-lg"
+          className="aspect-2/3 rounded-lg border border-border transition-shadow duration-300 group-hover:shadow-lg"
           imgClassName="transition-transform duration-300 group-hover:scale-105"
         />
         <span className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-background/80 px-1.5 py-0.5 text-xs font-semibold text-warning backdrop-blur">

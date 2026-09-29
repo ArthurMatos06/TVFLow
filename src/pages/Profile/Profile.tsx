@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
-import type { ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useMemo } from "react";
+import type { ReactNode } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
   EmptyState,
@@ -9,40 +9,58 @@ import {
   MediaImage,
   Skeleton,
   StarIcon,
-} from '@/components/ui'
-import { useFavorites, useMovieDetails, useRatings, useTVShowDetails } from '@/hooks'
-import { useAuth } from '@/hooks/useAuth'
-import { getImageUrl } from '@/services/tmdb'
-import type { Favorite, MediaType, Rating } from '@/types'
-import { formatYear } from '@/utils/media'
+} from "@/components/ui";
+import {
+  useFavorites,
+  useMovieDetails,
+  useRatings,
+  useTVShowDetails,
+} from "@/hooks";
+import { useAuth } from "@/hooks/useAuth";
+import { getImageUrl } from "@/services/tmdb";
+import type { Favorite, MediaType, Rating } from "@/types";
+import { formatYear } from "@/utils/media";
 
 export function Profile() {
-  const navigate = useNavigate()
-  const { user } = useAuth()
-  const { favorites } = useFavorites()
-  const { ratings } = useRatings()
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { favorites } = useFavorites();
+  const { ratings } = useRatings();
 
   const stats = useMemo(() => {
-    const movieRatings = ratings.filter((rating) => rating.mediaType === 'movie')
-    const tvRatings = ratings.filter((rating) => rating.mediaType === 'tv')
+    const movieRatings = ratings.filter(
+      (rating) => rating.mediaType === "movie",
+    );
+    const tvRatings = ratings.filter((rating) => rating.mediaType === "tv");
     const averageScore =
       ratings.length > 0
-        ? ratings.reduce((sum, rating) => sum + rating.score, 0) / ratings.length
-        : 0
-    return { movieCount: movieRatings.length, tvCount: tvRatings.length, averageScore }
-  }, [ratings])
+        ? ratings.reduce((sum, rating) => sum + rating.score, 0) /
+          ratings.length
+        : 0;
+    return {
+      movieCount: movieRatings.length,
+      tvCount: tvRatings.length,
+      averageScore,
+    };
+  }, [ratings]);
 
   const recentRatings = useMemo(
-    () => [...ratings].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6),
+    () =>
+      [...ratings]
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, 6),
     [ratings],
-  )
+  );
 
   const recentFavorites = useMemo(
-    () => [...favorites].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6),
+    () =>
+      [...favorites]
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, 6),
     [favorites],
-  )
+  );
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
@@ -50,25 +68,37 @@ export function Profile() {
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-6">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-surface text-2xl font-bold text-text transition-transform duration-300 hover:scale-105 sm:h-24 sm:w-24">
             {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="h-full w-full object-cover"
+              />
             ) : (
               user.name.charAt(0).toUpperCase()
             )}
           </div>
           <div className="flex flex-col items-center gap-1 text-center sm:items-start sm:text-left">
-            <h1 className="text-2xl font-bold text-text sm:text-3xl">{user.name}</h1>
+            <h1 className="text-2xl font-bold text-text sm:text-3xl">
+              {user.name}
+            </h1>
             <p className="text-sm text-text-muted">@{user.username}</p>
             {user.bio && (
-              <p className="mt-1 max-w-md text-sm leading-relaxed text-text-muted">{user.bio}</p>
+              <p className="mt-1 max-w-md text-sm leading-relaxed text-text-muted">
+                {user.bio}
+              </p>
             )}
             <p className="mt-1 text-xs text-text-muted">
-              Membro desde {new Date(user.createdAt).toLocaleDateString('pt-BR')}
+              Membro desde{" "}
+              {new Date(user.createdAt).toLocaleDateString("pt-BR")}
             </p>
           </div>
         </div>
-        <div className="flex justify-center lg:justify-end">
-          <Button variant="outline" onClick={() => navigate('/profile/edit')}>
+        <div className="flex justify-center lg:justify-end flex-col gap-3">
+          <Button variant="outline" onClick={() => navigate("/profile/edit")}>
             Editar perfil
+          </Button>
+          <Button variant="primary" onClick={() => logout()}>
+            Sair do Perfil
           </Button>
         </div>
       </section>
@@ -97,22 +127,26 @@ export function Profile() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-text sm:text-xl">Minhas avaliações</h2>
+        <h2 className="text-lg font-semibold text-text sm:text-xl">
+          Minhas avaliações
+        </h2>
         <RatedItemsGrid ratings={recentRatings} />
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-text sm:text-xl">Favoritos</h2>
+        <h2 className="text-lg font-semibold text-text sm:text-xl">
+          Favoritos
+        </h2>
         <FavoritesGrid favorites={recentFavorites} />
       </section>
     </div>
-  )
+  );
 }
 
 interface StatsCardProps {
-  label: string
-  value: number | string
-  icon: ReactNode
+  label: string;
+  value: number | string;
+  icon: ReactNode;
 }
 
 function StatsCard({ label, value, icon }: StatsCardProps) {
@@ -120,15 +154,17 @@ function StatsCard({ label, value, icon }: StatsCardProps) {
     <div className="animate-fade-in flex flex-col gap-2 rounded-xl border border-border bg-surface p-4 transition-all duration-200 hover:border-accent/40 hover:bg-surface-hover sm:p-5">
       <div className="flex items-center gap-2 text-text-muted">
         {icon}
-        <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+        <span className="text-xs font-medium uppercase tracking-wide">
+          {label}
+        </span>
       </div>
       <span className="text-2xl font-bold text-text sm:text-3xl">{value}</span>
     </div>
-  )
+  );
 }
 
 interface RatedItemsGridProps {
-  ratings: Rating[]
+  ratings: Rating[];
 }
 
 function RatedItemsGrid({ ratings }: RatedItemsGridProps) {
@@ -139,7 +175,7 @@ function RatedItemsGrid({ ratings }: RatedItemsGridProps) {
         description="Avalie filmes e séries para vê-los aqui."
         icon={<StarIcon className="h-8 w-8" />}
       />
-    )
+    );
   }
 
   return (
@@ -158,11 +194,11 @@ function RatedItemsGrid({ ratings }: RatedItemsGridProps) {
         />
       ))}
     </div>
-  )
+  );
 }
 
 interface FavoritesGridProps {
-  favorites: Favorite[]
+  favorites: Favorite[];
 }
 
 function FavoritesGrid({ favorites }: FavoritesGridProps) {
@@ -173,7 +209,7 @@ function FavoritesGrid({ favorites }: FavoritesGridProps) {
         description="Favorite filmes e séries para vê-los aqui."
         icon={<HeartIcon className="h-8 w-8" />}
       />
-    )
+    );
   }
 
   return (
@@ -191,36 +227,45 @@ function FavoritesGrid({ favorites }: FavoritesGridProps) {
         />
       ))}
     </div>
-  )
+  );
 }
 
 interface MediaItemCardProps {
-  mediaId: number
-  mediaType: MediaType
-  badge?: ReactNode
+  mediaId: number;
+  mediaType: MediaType;
+  badge?: ReactNode;
 }
 
 function MediaItemCard({ mediaId, mediaType, badge }: MediaItemCardProps) {
-  return mediaType === 'movie' ? (
+  return mediaType === "movie" ? (
     <MovieItemCard mediaId={mediaId} badge={badge} />
   ) : (
     <TVItemCard mediaId={mediaId} badge={badge} />
-  )
+  );
 }
 
-function MovieItemCard({ mediaId, badge }: { mediaId: number; badge?: ReactNode }) {
-  const { data: movie, isLoading, isError } = useMovieDetails(mediaId)
+function MovieItemCard({
+  mediaId,
+  badge,
+}: {
+  mediaId: number;
+  badge?: ReactNode;
+}) {
+  const { data: movie, isLoading, isError } = useMovieDetails(mediaId);
 
-  if (isLoading) return <MediaItemSkeleton />
-  if (isError || !movie) return <MediaItemFallback />
+  if (isLoading) return <MediaItemSkeleton />;
+  if (isError || !movie) return <MediaItemFallback />;
 
   return (
-    <Link to={`/movie/${movie.id}`} className="group animate-fade-in flex flex-col">
+    <Link
+      to={`/movie/${movie.id}`}
+      className="group animate-fade-in flex flex-col"
+    >
       <div className="relative">
         <MediaImage
-          src={getImageUrl(movie.poster_path, 'w342')}
+          src={getImageUrl(movie.poster_path, "w342")}
           alt={movie.title}
-          className="aspect-[2/3] rounded-lg border border-border"
+          className="aspect-2/3 rounded-lg border border-border"
           imgClassName="transition-transform duration-300 group-hover:scale-105"
         />
         {badge}
@@ -228,24 +273,32 @@ function MovieItemCard({ mediaId, badge }: { mediaId: number; badge?: ReactNode 
       <h3 className="mt-2 truncate text-sm font-medium text-text transition-colors group-hover:text-primary">
         {movie.title}
       </h3>
-      <p className="mt-0.5 truncate text-xs text-text-muted">{formatYear(movie.release_date)}</p>
+      <p className="mt-0.5 truncate text-xs text-text-muted">
+        {formatYear(movie.release_date)}
+      </p>
     </Link>
-  )
+  );
 }
 
-function TVItemCard({ mediaId, badge }: { mediaId: number; badge?: ReactNode }) {
-  const { data: show, isLoading, isError } = useTVShowDetails(mediaId)
+function TVItemCard({
+  mediaId,
+  badge,
+}: {
+  mediaId: number;
+  badge?: ReactNode;
+}) {
+  const { data: show, isLoading, isError } = useTVShowDetails(mediaId);
 
-  if (isLoading) return <MediaItemSkeleton />
-  if (isError || !show) return <MediaItemFallback />
+  if (isLoading) return <MediaItemSkeleton />;
+  if (isError || !show) return <MediaItemFallback />;
 
   return (
     <Link to={`/tv/${show.id}`} className="group animate-fade-in flex flex-col">
       <div className="relative">
         <MediaImage
-          src={getImageUrl(show.poster_path, 'w342')}
+          src={getImageUrl(show.poster_path, "w342")}
           alt={show.name}
-          className="aspect-[2/3] rounded-lg border border-border"
+          className="aspect-2/3 rounded-lg border border-border"
           imgClassName="transition-transform duration-300 group-hover:scale-105"
         />
         {badge}
@@ -253,27 +306,29 @@ function TVItemCard({ mediaId, badge }: { mediaId: number; badge?: ReactNode }) 
       <h3 className="mt-2 truncate text-sm font-medium text-text transition-colors group-hover:text-primary">
         {show.name}
       </h3>
-      <p className="mt-0.5 truncate text-xs text-text-muted">{formatYear(show.first_air_date)}</p>
+      <p className="mt-0.5 truncate text-xs text-text-muted">
+        {formatYear(show.first_air_date)}
+      </p>
     </Link>
-  )
+  );
 }
 
 function MediaItemSkeleton() {
   return (
     <div className="flex flex-col">
-      <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+      <Skeleton className="aspect-2/3 w-full rounded-lg" />
       <Skeleton className="mt-2 h-4 w-3/4" />
       <Skeleton className="mt-1 h-3 w-1/2" />
     </div>
-  )
+  );
 }
 
 function MediaItemFallback() {
   return (
-    <div className="flex aspect-[2/3] items-center justify-center rounded-lg border border-border bg-surface">
+    <div className="flex aspect-2/3 items-center justify-center rounded-lg border border-border bg-surface">
       <FilmIcon className="h-8 w-8 text-text-muted" />
     </div>
-  )
+  );
 }
 
 function TvIcon({ className }: { className?: string }) {
@@ -290,5 +345,5 @@ function TvIcon({ className }: { className?: string }) {
       <rect x="2" y="7" width="20" height="15" rx="2" />
       <path d="M17 2l-5 5-5-5" />
     </svg>
-  )
+  );
 }

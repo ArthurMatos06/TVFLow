@@ -12,7 +12,7 @@ interface MovieDetailsHeroProps {
 
 export function MovieDetailsHero({ movie, director }: MovieDetailsHeroProps) {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites()
-  const { setRating, getRating } = useRatings()
+  const {   setRating, getRating } = useRatings()
   const isMovieFavorite = isFavorite(movie.id)
   const userRating = getRating(movie.id) ?? 0
   const [backdropError, setBackdropError] = useState(false)
@@ -50,7 +50,7 @@ export function MovieDetailsHero({ movie, director }: MovieDetailsHeroProps) {
           <MediaImage
             src={posterUrl}
             alt={movie.title}
-            className="aspect-[2/3] rounded-xl border border-border shadow-lg"
+            className="aspect-2/3 rounded-xl border border-border shadow-lg"
           />
         </div>
         <div className="flex flex-col gap-4">

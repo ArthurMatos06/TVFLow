@@ -169,7 +169,7 @@ function FavoriteMovieCard({ favorite, onRemove, removing }: FavoriteMediaCardPr
             <MediaImage
               src={getImageUrl(movie.poster_path, 'w342')}
               alt={movie.title}
-              className="aspect-[2/3] rounded-lg border border-border"
+              className="aspect-2/3 rounded-lg border border-border"
               imgClassName="transition-transform duration-300 group-hover:scale-105"
             />
           </div>
@@ -198,7 +198,7 @@ function FavoriteTVCard({ favorite, onRemove, removing }: FavoriteMediaCardProps
             <MediaImage
               src={getImageUrl(show.poster_path, 'w342')}
               alt={show.name}
-              className="aspect-[2/3] rounded-lg border border-border"
+              className="aspect-2/3 rounded-lg border border-border"
               imgClassName="transition-transform duration-300 group-hover:scale-105"
             />
           </div>
@@ -242,7 +242,7 @@ function FavoriteCardSkeleton({ removing }: { removing: boolean }) {
       className={clsx('flex flex-col animate-fade-in', removing && 'animate-fade-out')}
       style={removing ? { animationDelay: '0ms' } : undefined}
     >
-      <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+      <Skeleton className="aspect-2/3 w-full rounded-lg" />
       <Skeleton className="mt-2 h-4 w-3/4" />
       <Skeleton className="mt-1 h-3 w-1/2" />
     </div>
@@ -251,7 +251,7 @@ function FavoriteCardSkeleton({ removing }: { removing: boolean }) {
 
 function FavoriteCardFallback() {
   return (
-    <div className="flex aspect-[2/3] items-center justify-center rounded-lg border border-border bg-surface">
+    <div className="flex aspect-2/3 items-center justify-center rounded-lg border border-border bg-surface">
       <HeartIcon className="h-6 w-6 text-text-muted" />
     </div>
   )

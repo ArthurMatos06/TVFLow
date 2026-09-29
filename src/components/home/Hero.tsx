@@ -18,7 +18,7 @@ export function Hero({ movie, genres, isLoading = false }: HeroProps) {
   if (isLoading) {
     return (
       <section className="relative overflow-hidden rounded-2xl border border-border bg-surface">
-        <Skeleton className="h-[420px] w-full rounded-none lg:h-[520px]" />
+        <Skeleton className="h-105 w-full rounded-none lg:h-130" />
       </section>
     )
   }

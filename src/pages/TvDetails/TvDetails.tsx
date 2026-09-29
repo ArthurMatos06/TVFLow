@@ -59,11 +59,11 @@ export function TvDetails() {
 function DetailsSkeleton() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <Skeleton className="h-[420px] w-full rounded-2xl lg:h-[520px]" />
+      <Skeleton className="h-105 w-full rounded-2xl lg:h-130" />
       <div className="flex gap-4 overflow-hidden">
         {Array.from({ length: 6 }).map((_, index) => (
           <div key={index} className="w-32 shrink-0 sm:w-36">
-            <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+            <Skeleton className="aspect-2/3 w-full rounded-lg" />
             <Skeleton className="mt-2 h-4 w-3/4" />
             <Skeleton className="mt-1 h-3 w-1/2" />
           </div>

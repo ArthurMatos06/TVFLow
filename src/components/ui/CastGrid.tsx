@@ -21,7 +21,7 @@ export function CastGrid({ cast }: CastGridProps) {
           <MediaImage
             src={getImageUrl(person.profile_path, 'w185')}
             alt={person.name}
-            className="aspect-[2/3] rounded-lg border border-border"
+            className="aspect-2/3 rounded-lg border border-border"
           />
           <h3 className="mt-2 truncate text-sm font-medium text-text">{person.name}</h3>
           <p className="truncate text-xs text-text-muted">{person.character}</p>

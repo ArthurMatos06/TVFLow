@@ -48,7 +48,7 @@ export function TVDetailsHero({ show }: TVDetailsHeroProps) {
           <MediaImage
             src={posterUrl}
             alt={show.name}
-            className="aspect-[2/3] rounded-xl border border-border shadow-lg"
+            className="aspect-2/3 rounded-xl border border-border shadow-lg"
           />
         </div>
         <div className="flex flex-col gap-4">
