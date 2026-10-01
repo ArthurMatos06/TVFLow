@@ -4,9 +4,6 @@ import type { User } from '@/types'
 import type { LoginCredentials, RegisterData } from '@/types/auth'
 import {
   clearAuthStorage,
-  getStoredToken,
-  getStoredUser,
-  setStoredToken,
   setStoredUser,
 } from '@/utils/auth'
 
@@ -35,15 +32,22 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (credentials) => {
     set({ isLoading: true, error: null })
+
     try {
-      const { user, token } = await authService.login(credentials)
-      setStoredToken(token)
-      setStoredUser(user)
-      set({ user, token, isAuthenticated: true, isLoading: false })
+      const { user } = await authService.login(credentials)
+
+      set({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+      })
     } catch (err) {
       set({
         isLoading: false,
-        error: err instanceof Error ? err.message : 'Erro ao fazer login. Tente novamente.',
+        error:
+            err instanceof Error
+                ? err.message
+                : 'Erro ao fazer login. Tente novamente.',
       })
     }
   },
@@ -51,10 +55,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (data) => {
     set({ isLoading: true, error: null })
     try {
-      const { user, token } = await authService.register(data)
-      setStoredToken(token)
-      setStoredUser(user)
-      set({ user, token, isAuthenticated: true, isLoading: false })
+      const { user } = await authService.register(data)
+      set({ user, isAuthenticated: true, isLoading: false })
     } catch (err) {
       set({
         isLoading: false,
@@ -73,14 +75,22 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user })
   },
 
-  hydrate: () => {
-    const token = getStoredToken()
-    const user = getStoredUser()
-    if (token && user) {
-      set({ user, token, isAuthenticated: true })
-    }
-    set({ isHydrated: true })
-  },
+  hydrate: async () => {
+    try {
+      const user = await authService.me()
 
+      set({
+        user,
+        isAuthenticated: true,
+        isHydrated: true,
+      })
+    } catch {
+      set({
+        user: null,
+        isAuthenticated: false,
+        isHydrated: true,
+      })
+    }
+  },
   clearError: () => set({ error: null }),
 }))

@@ -11,7 +11,7 @@ export const MOCK_USERS: MockUser[] = [
     id: 'user-1',
     name: 'Ana Souza',
     username: 'anasouza',
-    email: 'ana@tvflow.com',
+      email: 'ana@tvflow.com',
     password: '123456',
     avatarUrl: null,
     bio: 'Apaixonada por cinema e séries.',

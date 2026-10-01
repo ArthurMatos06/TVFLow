@@ -78,7 +78,7 @@ export const tmdbService = {
   async getPopularMovies(page = 1): Promise<TMDBMovie[]> {
     return fetchWithFallback(
       async () => {
-        const { data } = await tmdbClient.get<TMDBMovieResponse>('/movie/popular', {
+        const { data } = await tmdbClient.get<TMDBMovieResponse>('/movies/popular', {
           params: { page },
         })
         return data.results
