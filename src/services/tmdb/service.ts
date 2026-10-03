@@ -42,108 +42,69 @@ async function fetchWithFallback<T>(request: () => Promise<T>, fallback: () => T
   }
 }
 
-function sortMockMovies(movies: TMDBMovie[], sortBy?: string): TMDBMovie[] {
-  const sorted = [...movies]
-  switch (sortBy) {
-    case 'vote_average.desc':
-      return sorted.sort((a, b) => b.vote_average - a.vote_average)
-    case 'release_date.desc':
-      return sorted.sort((a, b) => b.release_date.localeCompare(a.release_date))
-    case 'original_title.asc':
-      return sorted.sort((a, b) => a.title.localeCompare(b.title))
-    default:
-      return sorted.sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
-  }
-}
 
-function sortMockTVShows(shows: TMDBTVShow[], sortBy?: string): TMDBTVShow[] {
-  const sorted = [...shows]
-  switch (sortBy) {
-    case 'vote_average.desc':
-      return sorted.sort((a, b) => b.vote_average - a.vote_average)
-    case 'first_air_date.desc':
-      return sorted.sort((a, b) => b.first_air_date.localeCompare(a.first_air_date))
-    case 'name.asc':
-      return sorted.sort((a, b) => a.name.localeCompare(b.name))
-    default:
-      return sorted.sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
-  }
-}
 
 function matchesQuery(text: string, query: string): boolean {
   return text.toLowerCase().includes(query.toLowerCase())
 }
 
-export const tmdbService = {
-  async getPopularMovies(page = 1): Promise<TMDBMovie[]> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBMovieResponse>('/movies/popular', {
-          params: { page },
-        })
+export   const tmdbService = {
+    async getPopularMovies(page = 1): Promise<TMDBMovie[]> {
+        const { data } = await tmdbClient.get<TMDBMovieResponse>(
+            '/movies/popular',
+            {
+                params: { page },
+            },
+        )
         return data.results
-      },
-      () => MOCK_MOVIES,
-    )
-  },
+    },
 
-  async getTrendingMovies(): Promise<TMDBMovie[]> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBMovieResponse>('/trending/movie/day')
+    async getTrendingMovies(page = 1): Promise<TMDBMovie[]> {
+        const {data} = await tmdbClient.get<TMDBMovieResponse>('/movies/trending',
+            {
+                params: {page},
+            },
+        )
         return data.results
-      },
-      () => MOCK_MOVIES,
-    )
-  },
+
+    },
 
   async getTopRatedMovies(page = 1): Promise<TMDBMovie[]> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBMovieResponse>('/movie/top_rated', {
-          params: { page },
-        })
-        return data.results
-      },
-      () => MOCK_MOVIES,
+    const {data} = await tmdbClient.get<TMDBMovieResponse>('/movies/top-rated',
+        {
+            params: {page},
+        },
     )
+      return data.results
+
   },
 
-  async getLatestMovies(page = 1): Promise<TMDBMovie[]> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBMovieResponse>('/movie/now_playing', {
-          params: { page },
-        })
+    async getLatestMovies(page = 1): Promise<TMDBMovie[]> {
+        const {data} = await tmdbClient.get<TMDBMovieResponse>('/movies/upcoming',
+            {
+                params: {page},
+            },
+        )
         return data.results
-      },
-      () => MOCK_MOVIES,
-    )
-  },
+
+    },
 
   async getMoviesByGenre(genreId: number, page = 1): Promise<TMDBMovie[]> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBMovieResponse>('/discover/movie', {
+        const { data } = await tmdbClient.get<TMDBMovieResponse>('/movies/by-genre', {
           params: { with_genres: genreId, page },
         })
         return data.results
       },
-      () => MOCK_MOVIES.filter((movie) => movie.genre_ids.includes(genreId)),
-    )
-  },
 
-  async getPopularTVShows(page = 1): Promise<TMDBTVShow[]> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBTVShowResponse>('/tv/popular', {
-          params: { page },
-        })
+    async getPopularTVShows(page = 1): Promise<TMDBTVShow[]> {
+        const { data } = await tmdbClient.get<TMDBTVShowResponse>(
+            '/series/popular',
+            {
+                params: { page },
+            },
+        )
         return data.results
-      },
-      () => MOCK_TV_SHOWS,
-    )
-  },
+    },
 
   async getTrendingTVShows(): Promise<TMDBTVShow[]> {
     return fetchWithFallback(
@@ -177,116 +138,80 @@ export const tmdbService = {
     )
   },
 
-  async searchMovies(query: string, page = 1): Promise<TMDBMovieResponse> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBMovieResponse>('/search/movie', {
-          params: { query, page },
-        })
-        return data
-      },
-      () => {
-        const results = MOCK_MOVIES.filter((movie) =>
-          matchesQuery(`${movie.title} ${movie.overview}`, query),
+    async searchMovies(query: string, page = 1): Promise<TMDBMovieResponse> {
+        const { data } = await tmdbClient.get<TMDBMovieResponse>(
+            '/movies/search',
+            {
+                params: { query, page },
+            },
         )
-        return { page, total_pages: 1, total_results: results.length, results }
-      },
-    )
-  },
 
-  async searchTVShows(query: string, page = 1): Promise<TMDBTVShowResponse> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBTVShowResponse>('/search/tv', {
-          params: { query, page },
-        })
         return data
-      },
-      () => {
-        const results = MOCK_TV_SHOWS.filter((show) =>
-          matchesQuery(`${show.name} ${show.overview}`, query),
+    },
+
+    async searchTVShows(query: string, page = 1): Promise<TMDBTVShowResponse> {
+        const { data } = await tmdbClient.get<TMDBTVShowResponse>(
+            '/series/search',
+            {
+                params: { query, page },
+            },
         )
-        return { page, total_pages: 1, total_results: results.length, results }
-      },
-    )
-  },
 
-  async searchMulti(query: string, page = 1): Promise<TMDBMultiResponse> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBMultiResponse>('/search/multi', {
-          params: { query, page },
-        })
         return data
-      },
-      () => {
-        const movieResults: TMDBMultiResult[] = MOCK_MOVIES.filter((movie) =>
-          matchesQuery(`${movie.title} ${movie.overview}`, query),
-        ).map((movie) => ({ ...movie, media_type: 'movie' }))
-        const tvResults: TMDBMultiResult[] = MOCK_TV_SHOWS.filter((show) =>
-          matchesQuery(`${show.name} ${show.overview}`, query),
-        ).map((show) => ({ ...show, media_type: 'tv' }))
-        const results = [...movieResults, ...tvResults]
-        return { page, total_pages: 1, total_results: results.length, results }
-      },
-    )
-  },
+    },
 
-  async discoverMovies(filters: DiscoverFilters = {}, page = 1): Promise<TMDBMovieResponse> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBMovieResponse>('/discover/movie', {
-          params: {
-            with_genres: filters.genreId ?? undefined,
-            primary_release_year: filters.year || undefined,
-            sort_by: filters.sortBy || 'popularity.desc',
-            page,
-          },
-        })
-        return data
-      },
-      () => {
-        const { genreId, year } = filters
-        let results = MOCK_MOVIES
-        if (genreId) {
-          results = results.filter((movie) => movie.genre_ids.includes(genreId))
-        }
-        if (year) {
-          results = results.filter((movie) => movie.release_date.startsWith(year))
-        }
-        results = sortMockMovies(results, filters.sortBy)
-        return { page, total_pages: 1, total_results: results.length, results }
-      },
-    )
-  },
+    async searchMulti(
+        query: string,
+        page = 1,
+    ): Promise<TMDBMultiResponse> {
+        const { data } = await tmdbClient.get<TMDBMultiResponse>(
+            '/search/multi',
+            {
+                params: { query, page },
+            },
+        )
 
-  async discoverTVShows(filters: DiscoverFilters = {}, page = 1): Promise<TMDBTVShowResponse> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TMDBTVShowResponse>('/discover/tv', {
-          params: {
-            with_genres: filters.genreId ?? undefined,
-            first_air_date_year: filters.year || undefined,
-            sort_by: filters.sortBy || 'popularity.desc',
-            page,
-          },
-        })
         return data
-      },
-      () => {
-        const { genreId, year } = filters
-        let results = MOCK_TV_SHOWS
-        if (genreId) {
-          results = results.filter((show) => show.genre_ids.includes(genreId))
-        }
-        if (year) {
-          results = results.filter((show) => show.first_air_date.startsWith(year))
-        }
-        results = sortMockTVShows(results, filters.sortBy)
-        return { page, total_pages: 1, total_results: results.length, results }
-      },
-    )
-  },
+    },
+
+    async discoverMovies(
+        filters: DiscoverFilters = {},
+        page = 1,
+    ): Promise<TMDBMovieResponse> {
+        const { data } = await tmdbClient.get<TMDBMovieResponse>(
+            '/movies/discover',
+            {
+                params: {
+                    with_genres: filters.genreId ?? undefined,
+                    primary_release_year: filters.year || undefined,
+                    sort_by: filters.sortBy || 'popularity.desc',
+                    page,
+                },
+            },
+        )
+        console.log("os parametros foram enviados",filters)
+        return data
+    },
+
+
+    async discoverTVShows(
+        filters: DiscoverFilters = {},
+        page = 1,
+    ): Promise<TMDBTVShowResponse> {
+        const { data } = await tmdbClient.get<TMDBTVShowResponse>(
+            '/series/discover',
+            {
+                params: {
+                    with_genres: filters.genreId ?? undefined,
+                    primary_release_year: filters.year || undefined,
+                    sort_by: filters.sortBy || 'popularity.desc',
+                    page,
+                },
+            },
+        )
+        console.log("os parametros foram enviados",filters)
+        return data
+    },
 
   async getMovieDetails(id: number): Promise<MovieDetailsResponse> {
     return fetchWithFallback(

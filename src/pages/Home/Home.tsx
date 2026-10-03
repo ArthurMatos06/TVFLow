@@ -88,7 +88,7 @@ export function Home() {
     [genres],
   )
 
-  const heroMovie = popularMovies.data?.[0]
+  const heroMovie =  popularMovies.data?.[0]
 
   return (
     <div className="flex flex-col gap-10 py-6 sm:gap-12 sm:py-8">
