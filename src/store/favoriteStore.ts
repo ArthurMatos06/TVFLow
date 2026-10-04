@@ -1,54 +1,72 @@
 import { create } from 'zustand'
 import type { Favorite, MediaType } from '@/types'
-import { getStoredFavorites, setStoredFavorites } from '@/utils/favorites'
-
-const LOCAL_USER_ID = 'local-user'
+import {tmdbClient} from "@/services/tmdb";
 
 interface FavoriteState {
   favorites: Favorite[]
-  addFavorite: (mediaId: number, mediaType: MediaType) => void
-  removeFavorite: (mediaId: number) => void
+  addFavorite: (mediaId: number, mediaType: MediaType) => Promise<void>
+  removeFavorite: (mediaId: number, mediaType: MediaType) => Promise<void>
   isFavorite: (mediaId: number) => boolean
   getFavorites: () => Favorite[]
-  hydrate: () => void
+  hydrate: () => Promise<void>
   clear: () => void
 }
 
 export const useFavoriteStore = create<FavoriteState>((set, get) => ({
-  favorites: getStoredFavorites(),
+  favorites: [],
 
-  addFavorite: (mediaId, mediaType) => {
+  addFavorite: async (mediaId, mediaType) => {
     const { favorites } = get()
-    if (favorites.some((favorite) => favorite.mediaId === mediaId)) return
 
-    const favorite: Favorite = {
-      id: crypto.randomUUID(),
-      userId: LOCAL_USER_ID,
-      mediaId,
-      mediaType,
-      createdAt: new Date().toISOString(),
+    if (favorites.some((favorite) => favorite.mediaId === mediaId)) {
+      return
     }
-    const next = [...favorites, favorite]
-    setStoredFavorites(next)
-    set({ favorites: next })
+
+    const { data } = await tmdbClient.post<Favorite>('/favorites', {
+      mediaId,
+      mediaType: mediaType.toUpperCase(),
+    })
+
+    set({
+      favorites: [...favorites, data],
+    })
   },
 
-  removeFavorite: (mediaId) => {
-    const next = get().favorites.filter((favorite) => favorite.mediaId !== mediaId)
-    setStoredFavorites(next)
-    set({ favorites: next })
+  removeFavorite: async (mediaId, mediaType) => {
+    await tmdbClient.delete(`/favorites/${mediaId}`, {
+      params: {
+        mediaType: mediaType.toUpperCase(),
+      },
+    })
+
+    set((state) => ({
+      favorites: state.favorites.filter(
+          (favorite) => favorite.mediaId !== mediaId,
+      ),
+    }))
   },
 
-  isFavorite: (mediaId) => get().favorites.some((favorite) => favorite.mediaId === mediaId),
+  isFavorite: (mediaId) =>
+      get().favorites.some(
+          (favorite) => favorite.mediaId === mediaId,
+      ),
 
   getFavorites: () => get().favorites,
 
-  hydrate: () => {
-    set({ favorites: getStoredFavorites() })
+  hydrate: async () => {
+    const { data } = await tmdbClient.get<Favorite[]>('/favorites')
+
+    set({
+      favorites: data.map((favorite) => ({
+        ...favorite,
+        mediaType: favorite.mediaType.toLowerCase() as MediaType,
+      })),
+    })
   },
 
   clear: () => {
-    setStoredFavorites([])
-    set({ favorites: [] })
+    set({
+      favorites: [],
+    })
   },
 }))

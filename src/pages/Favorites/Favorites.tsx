@@ -47,7 +47,7 @@ export function Favorites() {
     if (!pendingRemoval) return
     setRemovingId(pendingRemoval.id)
     window.setTimeout(() => {
-      removeFavorite(pendingRemoval.mediaId)
+      removeFavorite(pendingRemoval.mediaId,pendingRemoval.mediaType)
       setPendingRemoval(null)
       setRemovingId(null)
     }, REMOVAL_ANIMATION_MS)
@@ -136,7 +136,7 @@ interface FavoriteCardProps {
 const FavoriteCard = memo(
   function FavoriteCard({ favorite, onRemove, removing = false }: FavoriteCardProps) {
     const handleRemove = () => onRemove(favorite)
-    return favorite.mediaType === 'movie' ? (
+    return favorite.mediaType === 'movie'  ? (
       <FavoriteMovieCard favorite={favorite} onRemove={handleRemove} removing={removing} />
     ) : (
       <FavoriteTVCard favorite={favorite} onRemove={handleRemove} removing={removing} />

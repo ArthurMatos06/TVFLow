@@ -22,7 +22,7 @@ export function TVDetailsHero({ show }: TVDetailsHeroProps) {
 
   const handleFavorite = () => {
     if (isShowFavorite) {
-      removeFavorite(show.id)
+      removeFavorite(show.id,"tv")
     } else {
       addFavorite(show.id, 'tv')
     }

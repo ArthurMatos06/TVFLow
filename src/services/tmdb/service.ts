@@ -1,16 +1,12 @@
 import { MOCK_GENRES } from '@/mocks/genres.mock'
-import { MOCK_MOVIES } from '@/mocks/movies.mock'
 import { MOCK_TV_SHOWS } from '@/mocks/tvshows.mock'
-import { buildMockMovieDetails, buildMockTVShowDetails } from '@/mocks/details.mock'
 import type {
   MovieDetailsResponse,
-  SimilarMediaResponse,
   TMDBGenre,
   TMDBGenreListResponse,
   TMDBMovie,
   TMDBMovieResponse,
   TMDBMultiResponse,
-  TMDBMultiResult,
   TMDBTVShow,
   TMDBTVShowResponse,
   TVShowDetailsResponse,
@@ -44,9 +40,9 @@ async function fetchWithFallback<T>(request: () => Promise<T>, fallback: () => T
 
 
 
-function matchesQuery(text: string, query: string): boolean {
-  return text.toLowerCase().includes(query.toLowerCase())
-}
+// function matchesQuery(text: string, query: string): boolean {
+//   return text.toLowerCase().includes(query.toLowerCase())
+// }
 
 export   const tmdbService = {
     async getPopularMovies(page = 1): Promise<TMDBMovie[]> {
@@ -213,47 +209,35 @@ export   const tmdbService = {
         return data
     },
 
-  async getMovieDetails(id: number): Promise<MovieDetailsResponse> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<MovieDetailsResponse>(`/movie/${id}`, {
-          params: { append_to_response: 'credits,videos' },
-        })
+    async getMovieDetails(id: number): Promise<MovieDetailsResponse> {
+        const { data } = await tmdbClient.get<MovieDetailsResponse>(
+            `/movies/${id}`,
+        )
+
         return data
-      },
-      () => buildMockMovieDetails(id),
-    )
-  },
+    },
 
-  async getTVShowDetails(id: number): Promise<TVShowDetailsResponse> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<TVShowDetailsResponse>(`/tv/${id}`, {
-          params: { append_to_response: 'credits,videos' },
-        })
+    async getTVShowDetails(id: number): Promise<TVShowDetailsResponse> {
+        const { data } = await tmdbClient.get<TVShowDetailsResponse>(
+            `/series/${id}`,
+        )
+
         return data
-      },
-      () => buildMockTVShowDetails(id),
-    )
-  },
+    },
 
-  async getSimilarMovies(id: number): Promise<TMDBMovie[]> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<SimilarMediaResponse<TMDBMovie>>(`/movie/${id}/similar`)
-        return data.results
-      },
-      () => MOCK_MOVIES.filter((movie) => movie.id !== id),
-    )
-  },
+    async getSimilarMovies(id: number): Promise<TMDBMovie[]> {
+        const { data } = await tmdbClient.get<TMDBMovie[]>(
+            `/movies/${id}/similar`,
+        )
 
-  async getSimilarTVShows(id: number): Promise<TMDBTVShow[]> {
-    return fetchWithFallback(
-      async () => {
-        const { data } = await tmdbClient.get<SimilarMediaResponse<TMDBTVShow>>(`/tv/${id}/similar`)
-        return data.results
-      },
-      () => MOCK_TV_SHOWS.filter((show) => show.id !== id),
-    )
-  },
+        return data
+    },
+
+    async getSimilarTVShows(id: number): Promise<TMDBTVShow[]> {
+        const { data } = await tmdbClient.get<TMDBTVShow[]>(
+            `/series/${id}/similar`,
+        )
+
+        return data
+    }
 }

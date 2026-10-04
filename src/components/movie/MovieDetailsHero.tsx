@@ -24,7 +24,7 @@ export function MovieDetailsHero({ movie, director }: MovieDetailsHeroProps) {
 
   const handleFavorite = () => {
     if (isMovieFavorite) {
-      removeFavorite(movie.id)
+      removeFavorite(movie.id, 'movie')
     } else {
       addFavorite(movie.id, 'movie')
     }
