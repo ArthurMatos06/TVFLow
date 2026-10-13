@@ -41,7 +41,12 @@ export const authService = {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        username: name.toLowerCase().replace(/\s+/g, ""),
+      },
       select: safeUserSelect,
     });
 
@@ -65,5 +70,5 @@ export const authService = {
       where: { id: userId },
       // select: safeUserSelect,
     });
-  }
+  },
 };

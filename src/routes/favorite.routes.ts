@@ -29,8 +29,6 @@ export async function favoriteRoutes(app: FastifyInstance) {
 
         return reply.status(201).send(favorite);
       } catch (err) {
-        console.error("ERRO AO ADICIONAR FAVORITO:", err);
-
         return reply.status(500).send({
           error: "Erro ao adicionar favorito.",
         });
@@ -72,7 +70,7 @@ export async function favoriteRoutes(app: FastifyInstance) {
 
       try {
         const favorites = await favoriteService.getFavorites(userId);
-
+        console.log(favorites); //teste
         return reply.send(favorites);
       } catch {
         return reply.status(500).send({
