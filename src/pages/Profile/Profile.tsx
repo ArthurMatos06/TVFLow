@@ -47,7 +47,13 @@ export function Profile() {
   const recentRatings = useMemo(
     () =>
       [...ratings]
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+
+          return dateB - dateA;
+        })
         .slice(0, 6),
     [ratings],
   );
@@ -127,16 +133,39 @@ export function Profile() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-text sm:text-xl">
-          Minhas avaliações
-        </h2>
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold text-text sm:text-xl">
+            Minhas avaliações
+          </h2>
+
+          {ratings.length > 6 && (
+            <Link
+              to="/ratings"
+              className="shrink-0 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            >
+              Ver todas →
+            </Link>
+          )}
+        </div>
+
         <RatedItemsGrid ratings={recentRatings} />
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-text sm:text-xl">
-          Favoritos
-        </h2>
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold text-text sm:text-xl">
+            Favoritos
+          </h2>
+          {favorites.length > 6 && (
+            <Link
+              to="/favorites"
+              className="shrink-0 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            >
+              Ver todas →
+            </Link>
+          )}
+        </div>
+
         <FavoritesGrid favorites={recentFavorites} />
       </section>
     </div>
@@ -182,7 +211,7 @@ function RatedItemsGrid({ ratings }: RatedItemsGridProps) {
     <div className="stagger-fade-in grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
       {ratings.map((rating) => (
         <MediaItemCard
-          key={rating.id}
+          key={`${rating.mediaType}-${rating.mediaId}`}
           mediaId={rating.mediaId}
           mediaType={rating.mediaType}
           badge={

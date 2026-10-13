@@ -1,37 +1,39 @@
-import { lazy, Suspense } from 'react'
-import { useParams } from 'react-router-dom'
-import { MovieDetailsHero, SimilarMoviesSection } from '@/components/movie'
-import { CastGrid, ErrorState, Skeleton } from '@/components/ui'
-import { useGenres, useMovieDetails, useSimilarMovies } from '@/hooks'
-import type { Director, TMDBPerson } from '@/types'
+import { lazy, Suspense } from "react";
+import { useParams } from "react-router-dom";
+import { MovieDetailsHero, SimilarMoviesSection } from "@/components/movie";
+import { CastGrid, ErrorState, Skeleton } from "@/components/ui";
+import { useGenres, useMovieDetails, useSimilarMovies } from "@/hooks";
+import type { Director, TMDBPerson } from "@/types";
 
 const TrailerEmbed = lazy(() =>
-  import('@/components/ui/TrailerEmbed').then((module) => ({ default: module.TrailerEmbed })),
-)
+  import("@/components/ui/TrailerEmbed").then((module) => ({
+    default: module.TrailerEmbed,
+  })),
+);
 
 function getDirector(crew: TMDBPerson[]): Director | null {
-  const member = crew.find((person) => person.job === 'Director')
-  if (!member) return null
+  const member = crew.find((person) => person.job === "Director");
+  if (!member) return null;
   return {
     id: member.id,
     name: member.name,
-    job: member.job ?? 'Director',
-    department: member.department ?? 'Directing',
+    job: member.job ?? "Director",
+    department: member.department ?? "Directing",
     profile_path: member.profile_path,
-    credit_id: member.credit_id ?? '',
-  }
+    credit_id: member.credit_id ?? "",
+  };
 }
 
 export function MovieDetails() {
-  const { id } = useParams<{ id: string }>()
-  const movieId = Number(id)
+  const { id } = useParams<{ id: string }>();
+  const movieId = Number(id);
 
-  const details = useMovieDetails(movieId)
-  const similar = useSimilarMovies(movieId)
-  const { data: genres } = useGenres()
+  const details = useMovieDetails(movieId);
+  const similar = useSimilarMovies(movieId);
+  const { data: genres } = useGenres();
 
   if (details.isLoading) {
-    return <DetailsSkeleton />
+    return <DetailsSkeleton />;
   }
 
   if (details.isError) {
@@ -39,24 +41,29 @@ export function MovieDetails() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <ErrorState onRetry={() => void details.refetch()} />
       </div>
-    )
+    );
   }
 
-  if (!details.data) return null
+  if (!details.data) return null;
 
-  const movie = details.data
-  const director = getDirector(movie.credits.crew)
+  const movie = details.data;
+  const director = getDirector(movie.credits.crew);
   const trailer = movie.videos.results.find(
-    (video) => video.site === 'YouTube' && video.type === 'Trailer',
-  )
+    (video) => video.site === "YouTube" && video.type === "Trailer",
+  );
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <MovieDetailsHero movie={movie} director={director} />
 
       {trailer && (
-        <Suspense fallback={<Skeleton className="aspect-video w-full rounded-2xl" />}>
-          <TrailerEmbed videoKey={trailer.key} title={`Trailer de ${movie.title}`} />
+        <Suspense
+          fallback={<Skeleton className="aspect-video w-full rounded-2xl" />}
+        >
+          <TrailerEmbed
+            videoKey={trailer.key}
+            title={`Trailer de ${movie.title}`}
+          />
         </Suspense>
       )}
 
@@ -75,7 +82,7 @@ export function MovieDetails() {
         onRetry={() => void similar.refetch()}
       />
     </div>
-  )
+  );
 }
 
 function DetailsSkeleton() {
@@ -92,5 +99,5 @@ function DetailsSkeleton() {
         ))}
       </div>
     </div>
-  )
+  );
 }

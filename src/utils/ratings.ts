@@ -1,20 +1,20 @@
-import type { Rating } from '@/types'
+import type { Rating } from "@/types";
 
-const RATINGS_KEY = 'tvflow_ratings'
-
+const RATINGS_KEY = "tvflow_ratings";
+//  TODO: excluir arquivos mocks e arquivos que salvam no localstorage
 export function getStoredRatings(): Rating[] {
   try {
-    const stored = localStorage.getItem(RATINGS_KEY)
-    return stored ? (JSON.parse(stored) as Rating[]) : []
+    const stored = localStorage.getItem(RATINGS_KEY);
+    return stored ? (JSON.parse(stored) as Rating[]) : [];
   } catch {
-    return []
+    return [];
   }
 }
 
 export function setStoredRatings(ratings: Rating[]): void {
   try {
-    localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings))
+    localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings));
   } catch (error) {
-    console.error('Failed to save ratings:', error)
+    console.error("Failed to save ratings:", error);
   }
 }

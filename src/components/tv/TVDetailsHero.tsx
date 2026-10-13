@@ -1,36 +1,43 @@
-import { useState } from 'react'
-import { Button, GenreBadge, HeartIcon, MediaImage, StarIcon, StarRating } from '@/components/ui'
-import { useFavorites, useRatings } from '@/hooks'
-import { getImageUrl } from '@/services/tmdb'
-import type { TVShowDetailsResponse } from '@/types'
-import { formatRating, formatYear } from '@/utils/media'
+import { useState } from "react";
+import {
+  Button,
+  GenreBadge,
+  HeartIcon,
+  MediaImage,
+  StarIcon,
+  StarRating,
+} from "@/components/ui";
+import { useFavorites, useRatings } from "@/hooks";
+import { getImageUrl } from "@/services/tmdb";
+import type { TVShowDetailsResponse } from "@/types";
+import { formatRating, formatYear } from "@/utils/media";
 
 interface TVDetailsHeroProps {
-  show: TVShowDetailsResponse
+  show: TVShowDetailsResponse;
 }
 
 export function TVDetailsHero({ show }: TVDetailsHeroProps) {
-  const { isFavorite, addFavorite, removeFavorite } = useFavorites()
-  const { setRating, getRating } = useRatings()
-  const isShowFavorite = isFavorite(show.id)
-  const userRating = getRating(show.id) ?? 0
-  const [backdropError, setBackdropError] = useState(false)
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+  const { setRating, getRating } = useRatings();
+  const isShowFavorite = isFavorite(show.id);
+  const userRating = getRating(show.id) ?? 0;
+  const [backdropError, setBackdropError] = useState(false);
 
-  const backdropUrl = getImageUrl(show.backdrop_path, 'w1280')
-  const posterUrl = getImageUrl(show.poster_path, 'w342')
-  const year = formatYear(show.first_air_date)
+  const backdropUrl = getImageUrl(show.backdrop_path, "w1280");
+  const posterUrl = getImageUrl(show.poster_path, "w342");
+  const year = formatYear(show.first_air_date);
 
   const handleFavorite = () => {
     if (isShowFavorite) {
-      removeFavorite(show.id,"tv")
+      removeFavorite(show.id, "tv");
     } else {
-      addFavorite(show.id, 'tv')
+      addFavorite(show.id, "tv");
     }
-  }
+  };
 
   const handleRating = (rating: number) => {
-    setRating(show.id, 'tv', rating)
-  }
+    setRating(show.id, "tv", rating);
+  };
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-border">
@@ -53,9 +60,12 @@ export function TVDetailsHero({ show }: TVDetailsHeroProps) {
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-3 text-sm">
-            {year && <span className="font-medium text-text-muted">{year}</span>}
+            {year && (
+              <span className="font-medium text-text-muted">{year}</span>
+            )}
             <span className="font-medium text-text-muted">
-              {show.number_of_seasons} temporada{show.number_of_seasons !== 1 ? 's' : ''} ·{' '}
+              {show.number_of_seasons} temporada
+              {show.number_of_seasons !== 1 ? "s" : ""} ·{" "}
               {show.number_of_episodes} episódios
             </span>
             <span className="flex items-center gap-1 font-semibold text-warning">
@@ -63,7 +73,7 @@ export function TVDetailsHero({ show }: TVDetailsHeroProps) {
               {formatRating(show.vote_average)}
             </span>
             <span className="text-text-muted">
-              ({show.vote_count.toLocaleString('pt-BR')} avaliações)
+              ({show.vote_count.toLocaleString("pt-BR")} avaliações)
             </span>
           </div>
           <h1 className="text-3xl font-bold leading-tight text-text sm:text-4xl lg:text-5xl">
@@ -72,7 +82,9 @@ export function TVDetailsHero({ show }: TVDetailsHeroProps) {
           {show.original_name && show.original_name !== show.name && (
             <p className="text-sm text-text-muted">{show.original_name}</p>
           )}
-          {show.tagline && <p className="text-base italic text-text-muted">{show.tagline}</p>}
+          {show.tagline && (
+            <p className="text-base italic text-text-muted">{show.tagline}</p>
+          )}
           {show.genres.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {show.genres.map((genre) => (
@@ -86,18 +98,22 @@ export function TVDetailsHero({ show }: TVDetailsHeroProps) {
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <Button
               size="lg"
-              variant={isShowFavorite ? 'primary' : 'outline'}
+              variant={isShowFavorite ? "primary" : "outline"}
               onClick={handleFavorite}
             >
               <HeartIcon className="h-4 w-4" filled={isShowFavorite} />
-              {isShowFavorite ? 'Favoritado' : 'Favoritar'}
+              {isShowFavorite ? "Favoritado" : "Favoritar"}
             </Button>
           </div>
           <div className="mt-2 rounded-xl border border-border bg-surface/60 p-4">
-            <StarRating value={userRating} onChange={handleRating} label="Sua avaliação" />
+            <StarRating
+              value={userRating}
+              onChange={handleRating}
+              label="Sua avaliação"
+            />
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

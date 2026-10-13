@@ -1,33 +1,39 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Button, GenreBadge, HeartIcon, Skeleton, StarIcon } from '@/components/ui'
-import { getImageUrl } from '@/services/tmdb'
-import type { TMDBGenre, TMDBMovie } from '@/types'
-import { formatRating, formatYear, getGenreNames } from '@/utils/media'
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Button,
+  GenreBadge,
+  HeartIcon,
+  Skeleton,
+  StarIcon,
+} from "@/components/ui";
+import { getImageUrl } from "@/services/tmdb";
+import type { TMDBGenre, TMDBMovie } from "@/types";
+import { formatRating, formatYear, getGenreNames } from "@/utils/media";
 
 interface HeroProps {
-  movie?: TMDBMovie
-  genres?: TMDBGenre[]
-  isLoading?: boolean
+  movie?: TMDBMovie;
+  genres?: TMDBGenre[];
+  isLoading?: boolean;
 }
 
 export function Hero({ movie, genres, isLoading = false }: HeroProps) {
-  const [isFavorite, setIsFavorite] = useState(false)
-  const [backdropError, setBackdropError] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [backdropError, setBackdropError] = useState(false);
 
   if (isLoading) {
     return (
       <section className="relative overflow-hidden rounded-2xl border border-border bg-surface">
         <Skeleton className="h-105 w-full rounded-none lg:h-130" />
       </section>
-    )
+    );
   }
 
-  if (!movie) return null
+  if (!movie) return null;
 
-  const backdropUrl = getImageUrl(movie.backdrop_path, 'w1280')
-  const year = formatYear(movie.release_date)
-  const genreNames = getGenreNames(movie.genre_ids, genres)
+  const backdropUrl = getImageUrl(movie.backdrop_path, "w1280");
+  const year = formatYear(movie.release_date);
+  const genreNames = getGenreNames(movie.genre_ids, genres);
 
   return (
     <section className="group relative overflow-hidden rounded-2xl border border-border">
@@ -68,14 +74,14 @@ export function Hero({ movie, genres, isLoading = false }: HeroProps) {
           </Link>
           <Button
             size="lg"
-            variant={isFavorite ? 'primary' : 'outline'}
+            variant={isFavorite ? "primary" : "outline"}
             onClick={() => setIsFavorite((prev) => !prev)}
           >
             <HeartIcon className="h-4 w-4" filled={isFavorite} />
-            {isFavorite ? 'Favoritado' : 'Favoritar'}
+            {isFavorite ? "Favoritado" : "Favoritar"}
           </Button>
         </div>
       </div>
     </section>
-  )
+  );
 }
