@@ -77,8 +77,6 @@ export const tmdbService = {
       params.set("sort_by", sortBy);
     }
 
-    console.log("URL TMDB:", `${BASE_URL}/discover/movie?${params}`);
-
     return tmdbFetch(`${BASE_URL}/discover/movie?${params}`);
   },
   discoverSeries: (
@@ -102,8 +100,6 @@ export const tmdbService = {
       params.set("sort_by", sortBy);
     }
 
-    console.log(`URL TMDB: ${BASE_URL}/discover/tv?${params}`);
-
     return tmdbFetch(`${BASE_URL}/discover/tv?${params}`);
   },
 
@@ -114,8 +110,6 @@ export const tmdbService = {
       page: String(page),
     });
 
-    console.log(`URL TMDB: ${BASE_URL}/search/movie?${params}`);
-
     return tmdbFetch(`${BASE_URL}/search/movie?${params}`);
   },
   async searchSeries(query: string, page = 1) {
@@ -124,8 +118,6 @@ export const tmdbService = {
       query,
       page: String(page),
     });
-
-    console.log(`URL TMDB: ${BASE_URL}/search/tv?${params}`);
 
     return tmdbFetch(`${BASE_URL}/search/tv?${params}`);
   },
@@ -136,8 +128,6 @@ export const tmdbService = {
       page: String(page),
     });
 
-    console.log(`URL TMDB: ${BASE_URL}/search/multi?${params}`);
-
     return tmdbFetch(`${BASE_URL}/search/multi?${params}`);
   },
 
@@ -147,10 +137,6 @@ export const tmdbService = {
     language: 'pt-BR',
     append_to_response: 'credits,videos',
   })
-
-  console.log(
-    `URL TMDB: ${BASE_URL}/movie/${id}?${params}`,
-  )
 
   return tmdbFetch(
     `${BASE_URL}/movie/${id}?${params}`,

@@ -1,13 +1,19 @@
-import { FastifyInstance } from 'fastify'
+import type { FastifyInstance, FastifyReply } from 'fastify'
 import { tmdbService } from '../services/tmdb.service.js'
+import {
+  genreQuerySchema,
+  discoverQuerySchema,
+  searchQuerySchema,
+  idParamSchema,
+} from '../schemas.js'
 
 // ── Helper ────────────────────────────────────────────────────
 
 function wrap(handler: () => Promise<unknown>, errMsg: string) {
-  return async (_req: unknown, res: any) => {
+  return async (_req: unknown, res: FastifyReply) => {
     try {
       return await handler()
-    } catch (err) {
+    } catch {
       return res.status(500).send({ error: errMsg })
     }
   }
@@ -17,23 +23,26 @@ function wrap(handler: () => Promise<unknown>, errMsg: string) {
 
 export async function mediaRoutes(app: FastifyInstance) {
   // ── Filmes ────────────────────────────────────────────────
-  app.get('/movies/popular',  wrap(() => tmdbService.getPopularMovies(), 'Erro ao buscar filmes populares.'))
-  app.get('/movies/top-rated',wrap(() => tmdbService.getTopRated(),      'Erro ao buscar filmes mais bem avaliados.'))
-  app.get('/movies/upcoming', wrap(() => tmdbService.getUpcoming(),      'Erro ao buscar lançamentos.'))
-  app.get('/movies/trending', wrap(() => tmdbService.getTrending(),      'Erro ao buscar tendências.'))
+  app.get('/movies/popular', wrap(() => tmdbService.getPopularMovies(), 'Erro ao buscar filmes populares.'))
+  app.get('/movies/top-rated', wrap(() => tmdbService.getTopRated(), 'Erro ao buscar filmes mais bem avaliados.'))
+  app.get('/movies/upcoming', wrap(() => tmdbService.getUpcoming(), 'Erro ao buscar lançamentos.'))
+  app.get('/movies/trending', wrap(() => tmdbService.getTrending(), 'Erro ao buscar tendências.'))
+
   app.get('/movies/by-genre', async (req, reply) => {
-    const { with_genres, page } = req.query as {
-      with_genres: string
-      page?: string
+    const parsed = genreQuerySchema.safeParse(req.query)
+
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'Parâmetros inválidos.',
+        details: parsed.error.flatten().fieldErrors,
+      })
     }
 
     try {
       const movies = await tmdbService.getMoviesByGenre(
-        Number(with_genres),
-        Number(page ?? 1),
+        parsed.data.with_genres,
+        parsed.data.page,
       )
-
-      console.log('MOVIES BY GENRE:', movies)
 
       return reply.send(movies)
     } catch {
@@ -42,179 +51,220 @@ export async function mediaRoutes(app: FastifyInstance) {
       })
     }
   })
+
   app.get('/movies/discover', async (req, reply) => {
-  const { with_genres, primary_release_year, sort_by, page } = req.query as {
-    with_genres?: string
-    primary_release_year?: string
-    sort_by?: string
-    page?: string
-  }
+    const parsed = discoverQuerySchema.safeParse(req.query)
 
-  try {
-    const movies = await tmdbService.discoverMovies(
-      {
-        genreId: with_genres ? Number(with_genres) : undefined,
-        year: primary_release_year,
-        sortBy: sort_by,
-      },
-      Number(page ?? 1),
-    )
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'Parâmetros inválidos.',
+        details: parsed.error.flatten().fieldErrors,
+      })
+    }
 
-    return reply.send(movies)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao descobrir filmes.',
-    })
-  }
-})  
+    const { with_genres, primary_release_year, sort_by, page } = parsed.data
 
+    try {
+      const movies = await tmdbService.discoverMovies(
+        {
+          genreId: with_genres,
+          year: primary_release_year,
+          sortBy: sort_by,
+        },
+        page,
+      )
+
+      return reply.send(movies)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao descobrir filmes.',
+      })
+    }
+  })
 
   // ── Séries ────────────────────────────────────────────────
- app.get('/series/discover', async (req, reply) => {
-  const { with_genres, primary_release_year, sort_by, page } = req.query as {
-    with_genres?: string
-    primary_release_year?: string
-    sort_by?: string
-    page?: string
-  }
+  app.get('/series/discover', async (req, reply) => {
+    const parsed = discoverQuerySchema.safeParse(req.query)
 
-  try {
-    const series = await tmdbService.discoverSeries(
-      {
-        genreId: with_genres ? Number(with_genres) : undefined,
-        year: primary_release_year,
-        sortBy: sort_by,
-      },
-      Number(page ?? 1),
-    )
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'Parâmetros inválidos.',
+        details: parsed.error.flatten().fieldErrors,
+      })
+    }
 
-    return reply.send(series)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao descobrir series.',
-    })
-  }
-})
+    const { with_genres, primary_release_year, sort_by, page } = parsed.data
 
-  app.get('/series/popular',  wrap(() => tmdbService.getPopularSeries(), 'Erro ao buscar séries populares.'))
+    try {
+      const series = await tmdbService.discoverSeries(
+        {
+          genreId: with_genres,
+          year: primary_release_year,
+          sortBy: sort_by,
+        },
+        page,
+      )
 
+      return reply.send(series)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao descobrir séries.',
+      })
+    }
+  })
 
-    // ── Search ─────────────────────────────────────────────────
-    app.get('/movies/search', async (req, reply) => {
-  const { query, page } = req.query as {
-    query?: string
-    page?: string
-  }
+  app.get('/series/popular', wrap(() => tmdbService.getPopularSeries(), 'Erro ao buscar séries populares.'))
 
-  try {
-    const movies = await tmdbService.searchMovies(
-      query ?? '',
-      Number(page ?? 1),
-    )
+  // ── Search ─────────────────────────────────────────────────
+  app.get('/movies/search', async (req, reply) => {
+    const parsed = searchQuerySchema.safeParse(req.query)
 
-    return reply.send(movies)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao pesquisar filmes.',
-    })
-  }
-})
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'Parâmetros inválidos.',
+        details: parsed.error.flatten().fieldErrors,
+      })
+    }
 
-app.get('/series/search', async (req, reply) => {
-  const { query, page } = req.query as {
-    query?: string
-    page?: string
-  }
+    try {
+      const movies = await tmdbService.searchMovies(
+        parsed.data.query,
+        parsed.data.page,
+      )
 
-  try {
-    const series = await tmdbService.searchSeries(
-      query ?? '',
-      Number(page ?? 1),
-    )
+      return reply.send(movies)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao pesquisar filmes.',
+      })
+    }
+  })
 
-    return reply.send(series)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao pesquisar séries.',
-    })
-  }
-})
-app.get('/search/multi', async (req, reply) => {
-  const { query, page } = req.query as {
-    query?: string
-    page?: string
-  }
+  app.get('/series/search', async (req, reply) => {
+    const parsed = searchQuerySchema.safeParse(req.query)
 
-  try {
-    const results = await tmdbService.searchMulti(
-      query ?? '',
-      Number(page ?? 1),
-    )
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'Parâmetros inválidos.',
+        details: parsed.error.flatten().fieldErrors,
+      })
+    }
 
-    return reply.send(results)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao pesquisar filmes e séries.',
-    })
-  }
-})
+    try {
+      const series = await tmdbService.searchSeries(
+        parsed.data.query,
+        parsed.data.page,
+      )
 
-app.get('/movies/:id', async (req, reply) => {
-  const { id } = req.params as { id: string }
+      return reply.send(series)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao pesquisar séries.',
+      })
+    }
+  })
 
-  try {
-    const movie = await tmdbService.getMovieDetails(Number(id))
+  app.get('/search/multi', async (req, reply) => {
+    const parsed = searchQuerySchema.safeParse(req.query)
 
-    return reply.send(movie)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao buscar detalhes do filme.',
-    })
-  }
-})
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'Parâmetros inválidos.',
+        details: parsed.error.flatten().fieldErrors,
+      })
+    }
 
-app.get('/movies/:id/similar', async (req, reply) => {
-  const { id } = req.params as { id: string }
+    try {
+      const results = await tmdbService.searchMulti(
+        parsed.data.query,
+        parsed.data.page,
+      )
 
-  try {
-    const movies = await tmdbService.getSimilarMovies(Number(id))
+      return reply.send(results)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao pesquisar filmes e séries.',
+      })
+    }
+  })
 
-    return reply.send(movies)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao buscar filmes similares.',
-    })
-  }
-})
+  app.get('/movies/:id', async (req, reply) => {
+    const parsed = idParamSchema.safeParse(req.params)
 
-app.get('/series/:id', async (req, reply) => {
-  const { id } = req.params as { id: string }
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'id inválido.',
+      })
+    }
 
-  try {
-    const series = await tmdbService.getTVShowDetails(Number(id))
+    try {
+      const movie = await tmdbService.getMovieDetails(parsed.data.id)
 
-    return reply.send(series)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao buscar detalhes da série.',
-    })
-  }
-})
+      return reply.send(movie)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao buscar detalhes do filme.',
+      })
+    }
+  })
 
-app.get('/series/:id/similar', async (req, reply) => {
-  const { id } = req.params as { id: string }
+  app.get('/movies/:id/similar', async (req, reply) => {
+    const parsed = idParamSchema.safeParse(req.params)
 
-  try {
-    const series = await tmdbService.getSimilarTVShows(Number(id))
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'id inválido.',
+      })
+    }
 
-    return reply.send(series)
-  } catch {
-    return reply.status(500).send({
-      error: 'Erro ao buscar séries similares.',
-    })
-  }
-})
+    try {
+      const movies = await tmdbService.getSimilarMovies(parsed.data.id)
+
+      return reply.send(movies)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao buscar filmes similares.',
+      })
+    }
+  })
+
+  app.get('/series/:id', async (req, reply) => {
+    const parsed = idParamSchema.safeParse(req.params)
+
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'id inválido.',
+      })
+    }
+
+    try {
+      const series = await tmdbService.getTVShowDetails(parsed.data.id)
+
+      return reply.send(series)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao buscar detalhes da série.',
+      })
+    }
+  })
+
+  app.get('/series/:id/similar', async (req, reply) => {
+    const parsed = idParamSchema.safeParse(req.params)
+
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: 'id inválido.',
+      })
+    }
+
+    try {
+      const series = await tmdbService.getSimilarTVShows(parsed.data.id)
+
+      return reply.send(series)
+    } catch {
+      return reply.status(500).send({
+        error: 'Erro ao buscar séries similares.',
+      })
+    }
+  })
 }
-
-
-

@@ -3,17 +3,6 @@ import { z } from "zod";
 
 import { authService } from "../services/auth.service.js";
 
-declare module "@fastify/jwt" {
-  interface FastifyJWT {
-    payload: {
-      sub: string;
-    };
-    user: {
-      sub: string;
-    };
-  }
-}
-
 const registerBody = z.object({
   name: z.string().min(2, "Nome muito curto."),
   email: z.string().email("E-mail inválido."),
@@ -51,8 +40,7 @@ export async function authRoutes(app: FastifyInstance) {
 
       return res.status(201).send({ user });
     } catch (err) {
-      console.error("ERRO NO REGISTER:", err);
-
+      req.log.error(err, "ERRO NO REGISTER");
       const message =
         err instanceof Error ? err.message : "Erro ao registrar usuário.";
 

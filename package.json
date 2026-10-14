@@ -9,10 +9,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
-  },
-  "prisma": {
-    "schema": "src/prisma/contract.prisma"
+    "db:studio": "prisma studio",
+    "test": "tsx --test test/*.test.ts"
   },
   "type": "module",
   "dependencies": {

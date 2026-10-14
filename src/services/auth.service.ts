@@ -20,6 +20,7 @@ const safeUserSelect = {
   id: true,
   name: true,
   email: true,
+  username: true,
   avatarUrl: true,
   bio: true,
   createdAt: true,
@@ -29,13 +30,12 @@ const safeUserSelect = {
 
 export const authService = {
   async register({ name, email, password }: RegisterInput) {
-    const existing = await prisma.user.findFirst({
+    const existing = await prisma.user.findUnique({
       where: { email },
     });
 
     if (existing) {
-      if (existing.email === email) throw new Error("E-mail já cadastrado.");
-      throw new Error("E-mail já está em uso.");
+      throw new Error("E-mail já cadastrado.");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -54,21 +54,24 @@ export const authService = {
   },
 
   async login({ email, password }: LoginInput) {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { ...safeUserSelect, password: true },
+    });
 
     if (!user) throw new Error("Credenciais inválidas.");
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) throw new Error("Credenciais inválidas.");
 
-    const { password: _, ...safeUser } = user;
+    const { password: _password, ...safeUser } = user;
     return safeUser;
   },
 
   async getUserById(userId: string) {
     return await prisma.user.findUnique({
       where: { id: userId },
-      // select: safeUserSelect,
+      select: safeUserSelect,
     });
   },
 };

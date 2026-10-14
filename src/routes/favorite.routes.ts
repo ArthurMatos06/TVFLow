@@ -1,11 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { favoriteService } from "../services/favorite.service.js";
-import { z } from "zod";
-
-// const favoriteBody = z.object({
-//   mediaId: z.number(),
-//   mediaType: z.enum(['movie', 'tv']),
-// })
+import { favoriteBodySchema, mediaIdParamSchema } from "../schemas.js";
 
 export async function favoriteRoutes(app: FastifyInstance) {
   // Adicionar favorito
@@ -13,10 +8,16 @@ export async function favoriteRoutes(app: FastifyInstance) {
     "/favorites",
     { preHandler: [app.authenticate] },
     async (req, reply) => {
-      const { mediaId, mediaType } = req.body as {
-        mediaId: number;
-        mediaType: "MOVIE" | "TV";
-      };
+      const parsed = favoriteBodySchema.safeParse(req.body);
+
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: "Dados inválidos.",
+          details: parsed.error.flatten().fieldErrors,
+        });
+      }
+
+      const { mediaId, mediaType } = parsed.data;
 
       const userId = req.user.sub;
 
@@ -29,6 +30,7 @@ export async function favoriteRoutes(app: FastifyInstance) {
 
         return reply.status(201).send(favorite);
       } catch (err) {
+        req.log.error(err, "Erro ao adicionar favorito");
         return reply.status(500).send({
           error: "Erro ao adicionar favorito.",
         });
@@ -41,19 +43,23 @@ export async function favoriteRoutes(app: FastifyInstance) {
     "/favorites/:mediaId",
     { preHandler: [app.authenticate] },
     async (req, reply) => {
-      const { mediaId } = req.params as {
-        mediaId: string;
-      };
+      const parsed = mediaIdParamSchema.safeParse(req.params);
 
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: "mediaId inválido.",
+        });
+      }
+
+      const { mediaId } = parsed.data;
       const userId = req.user.sub;
 
       try {
-        await favoriteService.removeFavorite(userId, Number(mediaId));
+        await favoriteService.removeFavorite(userId, mediaId);
 
         return reply.status(204).send();
       } catch (err) {
-        console.error("ERRO AO REMOVER FAVORITO:", err);
-
+        req.log.error(err, "Erro ao remover favorito");
         return reply.status(500).send({
           error: "Erro ao remover favorito.",
         });
@@ -70,9 +76,9 @@ export async function favoriteRoutes(app: FastifyInstance) {
 
       try {
         const favorites = await favoriteService.getFavorites(userId);
-        console.log(favorites); //teste
         return reply.send(favorites);
-      } catch {
+      } catch (err) {
+        req.log.error(err, "Erro ao buscar favoritos");
         return reply.status(500).send({
           error: "Erro ao buscar favoritos.",
         });
@@ -84,23 +90,26 @@ export async function favoriteRoutes(app: FastifyInstance) {
   app.get(
     "/favorites/:mediaId",
     { preHandler: [app.authenticate] },
-    async (req, reply) => { 
-      const { mediaId } = req.params as {
-        mediaId: string;
-      };
+    async (req, reply) => {
+      const parsed = mediaIdParamSchema.safeParse(req.params);
 
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: "mediaId inválido.",
+        });
+      }
+
+      const { mediaId } = parsed.data;
       const userId = req.user.sub;
 
       try {
-        const favorite = await favoriteService.isFavorite(
-          userId,
-          Number(mediaId),
-        );
+        const favorite = await favoriteService.isFavorite(userId, mediaId);
 
         return reply.send({
           isFavorite: Boolean(favorite),
         });
-      } catch {
+      } catch (err) {
+        req.log.error(err, "Erro ao verificar favorito");
         return reply.status(500).send({
           error: "Erro ao verificar favorito.",
         });
