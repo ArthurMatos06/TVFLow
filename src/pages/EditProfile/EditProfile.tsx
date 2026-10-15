@@ -4,8 +4,8 @@ import { clsx } from "clsx";
 import { useNavigate } from "react-router-dom";
 import { Button, Input, Loading } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
+import { userService } from "@/services/api/userService";
 import type { User } from "@/types";
-import { tmdbClient } from "@/services/tmdb";
 
 interface EditProfileErrors {
   name?: string;
@@ -118,14 +118,8 @@ function EditProfileForm({ user }: { user: User }) {
     setMessage(null);
   };
 
-  // Envia a imagem para o backend, que a armazena no Cloudinary.
   const uploadAvatar = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const { data } = await tmdbClient.post<User>("/profile/avatar", formData);
-
-    return data;
+    return userService.uploadAvatar(file);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -145,14 +139,12 @@ function EditProfileForm({ user }: { user: User }) {
     setMessage(null);
 
     try {
-      // Atualiza os dados textuais do perfil.
-      updateUser({
+      await updateUser({
         name: name.trim(),
         username: username.trim(),
         bio: bio.trim() || null,
       });
 
-      // Envia o avatar somente se o usuário selecionou uma nova imagem.
       if (avatarFile) {
         const updatedUser = await uploadAvatar(avatarFile);
         updateUser(updatedUser);
@@ -261,7 +253,6 @@ function EditProfileForm({ user }: { user: User }) {
                 onChange={(event) => {
                   handleAvatarChange(event.target.files?.[0]);
 
-                  // Permite selecionar novamente o mesmo arquivo.
                   event.target.value = "";
                 }}
               />

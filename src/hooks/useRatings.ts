@@ -5,7 +5,6 @@ export function useRatings() {
   const setRating = useRatingStore((s) => s.setRating);
   const getRating = useRatingStore((s) => s.getRating);
   const getAllRatings = useRatingStore((s) => s.getAllRatings);
-  // const removeRating = useRatingStore((s) => s.removeRating);
 
   return { ratings, setRating, getRating, getAllRatings };
 }

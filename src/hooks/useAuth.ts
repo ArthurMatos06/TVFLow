@@ -2,7 +2,6 @@ import { useAuthStore } from '@/store/authStore'
 
 export function useAuth() {
   const user = useAuthStore((s) => s.user)
-  const token = useAuthStore((s) => s.token)
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const isHydrated = useAuthStore((s) => s.isHydrated)
   const isLoading = useAuthStore((s) => s.isLoading)
@@ -16,7 +15,6 @@ export function useAuth() {
 
   return {
     user,
-    token,
     isAuthenticated,
     isHydrated,
     isLoading,

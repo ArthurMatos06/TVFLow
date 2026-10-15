@@ -1,13 +1,12 @@
 import { create } from "zustand";
 import { authService } from "@/services/api/authService";
+import { userService } from "@/services/api/userService";
 import type { User } from "@/types";
 import type { LoginCredentials, RegisterData } from "@/types/auth";
 import { clearAuthStorage } from "@/utils/auth";
-import { tmdbClient } from "@/services/tmdb";
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
   isHydrated: boolean;
   isLoading: boolean;
@@ -15,18 +14,13 @@ interface AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
-  updateUser: (user: {
-    name: string;
-    username: string;
-    bio: string | null;
-  }) => void;
+  updateUser: (data: Partial<User>) => Promise<void>;
   hydrate: () => void;
   clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: null,
   isAuthenticated: false,
   isHydrated: false,
   isLoading: false,
@@ -72,23 +66,20 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     clearAuthStorage();
-    set({ user: null, token: null, isAuthenticated: false, error: null });
+    set({ user: null, isAuthenticated: false, error: null });
   },
 
   updateUser: async (data) => {
     set({ isLoading: true, error: null });
 
     try {
-      const { data: updatedUser } = await tmdbClient.put<User>(
-        "/profile",
-        data,
-      );
+      const updatedUser = await userService.updateProfile(data);
 
-      set({
-        user: updatedUser,
+      set((state) => ({
+        user: state.user ? { ...state.user, ...updatedUser } : updatedUser,
         isLoading: false,
         error: null,
-      });
+      }));
     } catch (err) {
       set({
         isLoading: false,

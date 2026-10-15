@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { Favorite, MediaType } from "@/types";
-import { tmdbClient } from "@/services/tmdb";
+import { favoriteService } from "@/services/api/favoriteService";
 
 interface FavoriteState {
   favorites: Favorite[];
@@ -11,10 +11,12 @@ interface FavoriteState {
   hydrate: () => Promise<void>;
   clear: () => void;
 }
+
 const normalizeFavorite = (favorite: Favorite): Favorite => ({
   ...favorite,
   mediaType: favorite.mediaType.toLowerCase() as MediaType,
 });
+
 export const useFavoriteStore = create<FavoriteState>((set, get) => ({
   favorites: [],
 
@@ -40,19 +42,18 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
     }));
 
     try {
-      const { data } = await tmdbClient.post<Favorite>("/favorites", {
+      const favorite = await favoriteService.addFavorite({
         mediaId,
-        mediaType: mediaType.toUpperCase(),
+        mediaType,
       });
-      // Substitui o objeto temporário pela resposta da API
       set((state) => ({
-        favorites: state.favorites.map((favorite) =>
-          favorite.mediaId === mediaId && favorite.mediaType === mediaType
-            ? normalizeFavorite(data)
-            : favorite,
+        favorites: state.favorites.map((item) =>
+          item.mediaId === mediaId && item.mediaType === mediaType
+            ? normalizeFavorite(favorite)
+            : item,
         ),
       }));
-    } catch (error) {
+    } catch {
       set((state) => ({
         favorites: state.favorites.filter(
           (favorite) =>
@@ -65,7 +66,6 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
   removeFavorite: async (mediaId, mediaType) => {
     const previousFavorites = get().favorites;
 
-    // Atualiza a interface imediatamente
     set((state) => ({
       favorites: state.favorites.filter(
         (favorite) =>
@@ -74,13 +74,8 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
     }));
 
     try {
-      await tmdbClient.delete(`/favorites/${mediaId}`, {
-        params: {
-          mediaType: mediaType.toUpperCase(),
-        },
-      });
+      await favoriteService.removeFavorite(mediaId);
     } catch (error) {
-      // Restaura o estado anterior se a API falhar
       set({ favorites: previousFavorites });
       throw error;
     }
@@ -90,15 +85,11 @@ export const useFavoriteStore = create<FavoriteState>((set, get) => ({
     get().favorites.some((favorite) => favorite.mediaId === mediaId),
 
   getFavorites: () => get().favorites,
-  //refatorar porque tem uma funcao que já chama o lowerCase
-  hydrate: async () => {
-    const { data } = await tmdbClient.get<Favorite[]>("/favorites");
 
+  hydrate: async () => {
+    const data = await favoriteService.getFavorites();
     set({
-      favorites: data.map((favorite) => ({
-        ...favorite,
-        mediaType: favorite.mediaType.toLowerCase() as MediaType,
-      })),
+      favorites: data.map(normalizeFavorite),
     });
   },
 

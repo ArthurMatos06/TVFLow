@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { MediaType, Rating } from "@/types";
-import { tmdbClient } from "@/services/tmdb";
+import { ratingService } from "@/services/api/ratingService";
 
 interface RatingState {
   ratings: Rating[];
@@ -24,13 +24,9 @@ export const useRatingStore = create<RatingState>((set, get) => ({
   ratings: [],
 
   setRating: async (mediaId, mediaType, score) => {
-    const { data } = await tmdbClient.post<Rating>("/ratings", {
-      mediaId,
-      mediaType: mediaType.toUpperCase(),
-      score,
-    });
+    const rating = await ratingService.setRating({ mediaId, mediaType, score });
 
-    const normalizedRating = normalizeRating(data);
+    const normalizedRating = normalizeRating(rating);
 
     set((state) => {
       const exists = state.ratings.some(
@@ -40,10 +36,10 @@ export const useRatingStore = create<RatingState>((set, get) => ({
 
       return {
         ratings: exists
-          ? state.ratings.map((rating) =>
-              rating.mediaId === mediaId && rating.mediaType === mediaType
+          ? state.ratings.map((item) =>
+              item.mediaId === mediaId && item.mediaType === mediaType
                 ? normalizedRating
-                : rating,
+                : item,
             )
           : [...state.ratings, normalizedRating],
       };
@@ -63,7 +59,7 @@ export const useRatingStore = create<RatingState>((set, get) => ({
   getAllRatings: () => get().ratings,
 
   hydrate: async () => {
-    const { data } = await tmdbClient.get<Rating[]>("/ratings");
+    const data = await ratingService.getRatings();
 
     set({
       ratings: data.map(normalizeRating),
