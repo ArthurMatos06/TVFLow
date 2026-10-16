@@ -1,0 +1,319 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-background: #0b0c10;
+  --color-surface: #16171f;
+  --color-surface-hover: #1e202b;
+  --color-border: #2a2c38;
+  --color-primary: #e50914;
+  --color-primary-hover: #ff1a25;
+  --color-accent: #c084fc;
+  --color-text: #f3f4f6;
+  --color-text-muted: #9ca3af;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+
+  --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* ===== Animações (Etapa 7) ===== */
+
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out both;
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.3s ease-in both;
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 0.4s ease-out both;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s ease-out both;
+  }
+
+  .animate-slide-in-up {
+    animation: slide-in-up 0.4s ease-out both;
+  }
+
+  .animate-slide-in-down {
+    animation: slide-in-down 0.4s ease-out both;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out both;
+  }
+
+  .animate-bounce-soft {
+    animation: bounce-soft 1.2s ease-in-out infinite;
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 1.2s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 1.2s linear infinite;
+  }
+
+  /* Stagger effect para grids: os cards precisam de .animate-fade-in */
+  .stagger-fade-in > *:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  .stagger-fade-in > *:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .stagger-fade-in > *:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+
+  .stagger-fade-in > *:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+
+  .stagger-fade-in > *:nth-child(5) {
+    animation-delay: 0.25s;
+  }
+
+  .stagger-fade-in > *:nth-child(6) {
+    animation-delay: 0.3s;
+  }
+
+  .stagger-fade-in > *:nth-child(n + 7) {
+    animation-delay: 0.35s;
+  }
+
+  /* Carrossel: fade-in dos itens com stagger */
+  .carousel-track > * {
+    animation: fade-in 0.5s ease-out both;
+  }
+
+  .carousel-track > *:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  .carousel-track > *:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .carousel-track > *:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+
+  .carousel-track > *:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+
+  .carousel-track > *:nth-child(5) {
+    animation-delay: 0.25s;
+  }
+
+  .carousel-track > *:nth-child(6) {
+    animation-delay: 0.3s;
+  }
+
+  .carousel-track > *:nth-child(n + 7) {
+    animation-delay: 0.35s;
+  }
+
+  /* Gradiente fade nas laterais do carrossel */
+  .carousel-fade::before,
+  .carousel-fade::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2.5rem;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .carousel-fade::before {
+    left: 0;
+    background: linear-gradient(to right, var(--color-background), transparent);
+  }
+
+  .carousel-fade::after {
+    right: 0;
+    background: linear-gradient(to left, var(--color-background), transparent);
+  }
+
+  /* Skeleton com shimmer em vez de pulse */
+  .shimmer-skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-surface-hover);
+  }
+
+  .shimmer-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.07), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+}
+
+/* ===== Keyframes (Etapa 7) ===== */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.25rem);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Acessibilidade: respeita a preferência por menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
