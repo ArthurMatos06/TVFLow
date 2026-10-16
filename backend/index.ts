@@ -13,15 +13,12 @@ import { favoriteRoutes } from "./src/routes/favorite.routes.js";
 import { RatingRoute } from "./src/routes/ratings.routes.js";
 import { ProfileRoute } from "./src/routes/profile.routes.js";
 import multipart from "@fastify/multipart";
+import { registerCors } from './src/config/cors.js'
 
 const app = Fastify({ logger: true });
-//cors
-await app.register(cors, {
-  origin: "http://localhost:5173",
-  credentials: true,
-  methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-});
 
+//cors
+await registerCors(app)
 // Plugins
 await app.register(cookie);
 

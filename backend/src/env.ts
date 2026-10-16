@@ -6,6 +6,7 @@ const envSchema = z.object({
   TMDB_TOKEN:   z.string().min(1, 'TMDB_TOKEN é obrigatório.'),
   PORT:         z.coerce.number().default(3000),
   NODE_ENV:     z.enum(['development', 'production', 'test']).default('development'),
+  CORS_ORIGIN: z.string(),
 })
 
 const parsed = envSchema.safeParse(process.env)
