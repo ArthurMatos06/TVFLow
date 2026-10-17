@@ -56,6 +56,8 @@ export const tmdbService = {
     tmdbFetch(
       `${BASE_URL}/discover/movie?language=pt-BR&with_genres=${genreId}&page=${page}`,
     ),
+  getMovieGenres: () =>
+    tmdbFetch(`${BASE_URL}/genre/movie/list?language=pt-BR`),
   discoverMovies: (
     { genreId, year, sortBy }: DiscoverFilters = {},
     page = 1,
@@ -131,50 +133,45 @@ export const tmdbService = {
     return tmdbFetch(`${BASE_URL}/search/multi?${params}`);
   },
 
-
   async getMovieDetails(id: number) {
-  const params = new URLSearchParams({
-    language: 'pt-BR',
-    append_to_response: 'credits,videos',
-  })
+    const params = new URLSearchParams({
+      language: "pt-BR",
+      append_to_response: "credits,videos",
+    });
 
-  return tmdbFetch(
-    `${BASE_URL}/movie/${id}?${params}`,
-  )
-},
+    return tmdbFetch(`${BASE_URL}/movie/${id}?${params}`);
+  },
 
-async getSimilarMovies(id: number) {
-  const params = new URLSearchParams({
-    language: 'pt-BR',
-  })
+  async getSimilarMovies(id: number) {
+    const params = new URLSearchParams({
+      language: "pt-BR",
+    });
 
-  const data = await tmdbFetch(
-    `${BASE_URL}/movie/${id}/similar?${params}`,
-  ) as { results: unknown[] }
+    const data = (await tmdbFetch(
+      `${BASE_URL}/movie/${id}/similar?${params}`,
+    )) as { results: unknown[] };
 
-  return data.results
-},
+    return data.results;
+  },
 
-async getTVShowDetails(id: number) {
-  const params = new URLSearchParams({
-    language: 'pt-BR',
-    append_to_response: 'credits,videos',
-  })
+  async getTVShowDetails(id: number) {
+    const params = new URLSearchParams({
+      language: "pt-BR",
+      append_to_response: "credits,videos",
+    });
 
-  return tmdbFetch(
-    `${BASE_URL}/tv/${id}?${params}`,
-  )
-},
+    return tmdbFetch(`${BASE_URL}/tv/${id}?${params}`);
+  },
 
-async getSimilarTVShows(id: number) {
-  const params = new URLSearchParams({
-    language: 'pt-BR',
-  })
+  async getSimilarTVShows(id: number) {
+    const params = new URLSearchParams({
+      language: "pt-BR",
+    });
 
-  const data = await tmdbFetch(
-    `${BASE_URL}/tv/${id}/similar?${params}`,
-  ) as { results: unknown[] }
+    const data = (await tmdbFetch(
+      `${BASE_URL}/tv/${id}/similar?${params}`,
+    )) as { results: unknown[] };
 
-  return data.results
-}
+    return data.results;
+  },
 };

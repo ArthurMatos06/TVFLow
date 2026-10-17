@@ -27,6 +27,7 @@ export async function mediaRoutes(app: FastifyInstance) {
   app.get('/movies/top-rated', wrap(() => tmdbService.getTopRated(), 'Erro ao buscar filmes mais bem avaliados.'))
   app.get('/movies/upcoming', wrap(() => tmdbService.getUpcoming(), 'Erro ao buscar lançamentos.'))
   app.get('/movies/trending', wrap(() => tmdbService.getTrending(), 'Erro ao buscar tendências.'))
+  app.get('/genre/movie/list', wrap(() => tmdbService.getMovieGenres(), 'Erro ao buscar gêneros.'))
 
   app.get('/movies/by-genre', async (req, reply) => {
     const parsed = genreQuerySchema.safeParse(req.query)
