@@ -4,12 +4,12 @@ import { apiClient } from './client'
 
 export const userService = {
   async getProfile(): Promise<User> {
-    const response = await apiClient.get<{ user: User }>('/auth/me')
+    const response = await apiClient.get<{ user: User }>('/api/auth/me')
     return response.data.user
   },
 
   async updateProfile(data: UpdateProfileInput): Promise<User> {
-    const response = await apiClient.put<User>('/profile', data)
+    const response = await apiClient.put<User>('/api/profile', data)
     return response.data
   },
 
@@ -17,7 +17,7 @@ export const userService = {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await apiClient.post<User>('/profile/avatar', formData)
+    const response = await apiClient.post<User>('/api/profile/avatar', formData)
     return response.data
   },
 }

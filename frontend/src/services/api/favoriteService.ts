@@ -8,12 +8,12 @@ interface AddFavoriteInput {
 
 export const favoriteService = {
   async getFavorites(): Promise<Favorite[]> {
-    const response = await apiClient.get<Favorite[]>('/favorites')
+    const response = await apiClient.get<Favorite[]>('/api/favorites')
     return response.data
   },
 
   async addFavorite({ mediaId, mediaType }: AddFavoriteInput): Promise<Favorite> {
-    const response = await apiClient.post<Favorite>('/favorites', {
+    const response = await apiClient.post<Favorite>('/api/favorites', {
       mediaId,
       mediaType: mediaType.toUpperCase(),
     })
@@ -21,11 +21,11 @@ export const favoriteService = {
   },
 
   async removeFavorite(mediaId: number): Promise<void> {
-    await apiClient.delete(`/favorites/${mediaId}`)
+    await apiClient.delete(`/api/favorites/${mediaId}`)
   },
 
   async isFavorite(mediaId: number): Promise<boolean> {
-    const response = await apiClient.get<{ isFavorite: boolean }>(`/favorites/${mediaId}`)
+    const response = await apiClient.get<{ isFavorite: boolean }>(`/api/favorites/${mediaId}`)
     return response.data.isFavorite
   },
 }

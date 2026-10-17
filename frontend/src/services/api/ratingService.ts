@@ -9,14 +9,14 @@ interface SetRatingInput {
 
 export const ratingService = {
   async getRatings(mediaType?: MediaType): Promise<Rating[]> {
-    const response = await apiClient.get<Rating[]>('/ratings', {
+    const response = await apiClient.get<Rating[]>('/api/ratings', {
       params: mediaType ? { mediaType: mediaType.toUpperCase() } : undefined,
     })
     return response.data
   },
 
   async setRating({ mediaId, mediaType, score }: SetRatingInput): Promise<Rating> {
-    const response = await apiClient.post<Rating>('/ratings', {
+    const response = await apiClient.post<Rating>('/api/ratings', {
       mediaId,
       mediaType: mediaType.toUpperCase(),
       score,
